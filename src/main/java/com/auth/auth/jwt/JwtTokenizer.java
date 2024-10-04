@@ -7,6 +7,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Component
 public class JwtTokenizer {
     private final RedisTemplate<String, Object> redisTemplate;
@@ -74,6 +76,7 @@ public class JwtTokenizer {
 
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(username, accessToken, accessTokenExpirationMinutes, TimeUnit.MINUTES);
+        log.info("Saving token for user: " + username + " with expiration: " + accessTokenExpirationMinutes);
         return accessToken;
     }
 
@@ -131,5 +134,15 @@ public class JwtTokenizer {
                     return true;
                 })
                 .orElse(false); // 키가 존재하지 않거나 삭제되지 않았을 때 false 반환
+    }
+
+    // 토큰에서 이메일 추출
+    public String getEmailFromToken(String token) {
+        Jws<Claims> claims = Jwts.parserBuilder()
+                .setSigningKey(getKeyFromBase64EncodeKey(secretKey))
+                .build()
+                .parseClaimsJws(token);
+
+        return claims.getBody().getSubject();  // 일반적으로 subject에 이메일이 저장됨
     }
 }

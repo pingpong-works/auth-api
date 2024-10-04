@@ -24,7 +24,7 @@ public class Employee extends Auditable {
     private long employeeId;
 
     @NotNull
-    @Column(name = "name", length = 255, nullable = false, unique = true)
+    @Column(name = "name", length = 255, nullable = false, unique = false)
     private String name;
 
     @NotNull

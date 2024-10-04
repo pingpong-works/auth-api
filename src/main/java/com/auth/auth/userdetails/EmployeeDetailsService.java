@@ -26,8 +26,8 @@ public class EmployeeDetailsService implements UserDetailsService {
 
     //username 은 사용자를 인증하기 위한 고유 식별자. 우리 서비스는 memberId 로 식별함.
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<Employee> optionalEmployee = employeeRepository.findByEmail(email);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Employee> optionalEmployee = employeeRepository.findByEmail(username);
         Employee findEmployee = optionalEmployee.orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
 
         return new EmployeeDetails(findEmployee);

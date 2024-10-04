@@ -7,17 +7,29 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface EmployeeMapper {
 
-    // Employee -> EmployeeResponseDto
-    EmployeeDto.Response employeeToEmployeeResponseDto(Employee employee);
+//    // Employee -> EmployeeResponseDto
+//    EmployeeDto.Response employeeToEmployeeResponseDto(Employee employee);
+//
+//    // EmployeePostDto -> Employee
+//    @Mapping(source = "departmentId", target = "department.id")
+//    Employee employeePostDtoToEmployee(EmployeeDto.Post employeePostDto);
+//
+//    // EmployeePatchDto -> Employee
+//    @Mapping(source = "departmentId", target = "department.id")
+//    void updateEmployeeFromPatchDto(EmployeeDto.Patch employeePatchDto, @MappingTarget Employee employee);
 
-    // EmployeePostDto -> Employee
-    @Mapping(source = "departmentId", target = "department.id")
-    Employee employeePostDtoToEmployee(EmployeeDto.Post employeePostDto);
+    Employee employeePostToEmployee(EmployeeDto.Post post);
 
-    // EmployeePatchDto -> Employee
-    @Mapping(source = "departmentId", target = "department.id")
-    void updateEmployeeFromPatchDto(EmployeeDto.Patch employeePatchDto, @MappingTarget Employee employee);
+    Employee employeePatchToEmployee(EmployeeDto.Patch patch);
+
+    EmployeeDto.Response employeeToResponseDto(Employee employee);
+
+    List<EmployeeDto.Response> employeesToResponseDto(List<Employee> employees);
+
+//    EmployeeDto.InfoResponse employeeToEmployeeInfoResponse(Employee employee);
 }
