@@ -1,6 +1,5 @@
 package com.auth.auth.controller;
 
-
 import com.auth.auth.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

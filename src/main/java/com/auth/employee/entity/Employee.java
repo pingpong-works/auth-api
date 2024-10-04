@@ -2,6 +2,7 @@ package com.auth.employee.entity;
 
 import com.auth.audit.Auditable;
 import com.auth.department.entity.Department;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,7 @@ public class Employee extends Auditable {
     private long employeeId;
 
     @NotNull
-    @Column(name = "name", length = 255, nullable = false, unique = true)
+    @Column(name = "name", length = 255, nullable = false, unique = false)
     private String name;
 
     @NotNull
@@ -52,6 +53,7 @@ public class Employee extends Auditable {
 
     @ManyToOne
     @JoinColumn(name = "department_id")
+    @JsonBackReference // 역참조 관계 설정
     private Department department;
 
     public enum EmployeeStatus {

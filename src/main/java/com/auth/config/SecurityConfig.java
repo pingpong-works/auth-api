@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,6 +26,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -46,7 +48,7 @@ public class SecurityConfig {
                 .headers().frameOptions().sameOrigin()
                 .and()
                 .csrf().disable()
-                .logout().disable()
+                .logout().disable()  // 직접 구현한 로그아웃 사용
                 .cors(withDefaults())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -59,52 +61,46 @@ public class SecurityConfig {
                 .apply(new CustomFilterConfigurer())
                 .and()
                 .authorizeHttpRequests(authorize -> authorize
-                        .antMatchers(HttpMethod.POST, "/logout").hasAnyRole("TL", "TM")
-                        // 모든 테이블 조회는 팀장, 사원 가능.
-                        .antMatchers(HttpMethod.GET,"/employees").hasAnyRole("TL", "TM")
-//                        .antMatchers(HttpMethod.GET,"/orders").hasAnyRole("TL", "TM")
-//                        .antMatchers(HttpMethod.GET,"/items").hasAnyRole("TL", "TM")
-//                        .antMatchers(HttpMethod.GET,"/sales-prices").hasAnyRole("TL", "TM")
-//                        .antMatchers(HttpMethod.GET,"/customers").hasAnyRole("TL", "TM")
-//                        .antMatchers(HttpMethod.GET,"/order-histories").hasAnyRole("TL", "TM")
-                        // 주문 등록은 팀장, 사원 가능.
-//                        .antMatchers(HttpMethod.POST,"/orders").hasAnyRole("TL", "TM")
-                        // 마스터 테이블 등록은 팀장만 가능.
-                        .antMatchers(HttpMethod.POST,"/departments").hasRole("TL")
-//                        .antMatchers(HttpMethod.POST,"/sales-prices").hasRole("TL")
-//                        .antMatchers(HttpMethod.POST,"/customers").hasRole("TL")
-                        // 주문 수정은 팀장, 사원 가능. 사원 > 내용 수정 가능. 팀장 > 권한 수정까지 가능.
-//                        .antMatchers(HttpMethod.PATCH,"/orders/**").hasAnyRole("TL", "TM")
-                        // 마스터 테이블 수정은 팀장만 가능.
-//                        .antMatchers(HttpMethod.PATCH,"/items/**").hasRole("TL")
-//                        .antMatchers(HttpMethod.PATCH,"/sales-prices/**").hasRole("TL")
-//                        .antMatchers(HttpMethod.PATCH,"/customers/**").hasRole("TL")
-                        // 삭제는 팀장만 가능.
-//                        .antMatchers(HttpMethod.DELETE,"/items/**").hasRole("TL")
-//                        .antMatchers(HttpMethod.DELETE,"/sales-prices/**").hasRole("TL")
-//                        .antMatchers(HttpMethod.DELETE,"/customers/**").hasRole("TL")
-//                        .antMatchers(HttpMethod.DELETE,"/orders/**").hasAnyRole("TL")
-                        .anyRequest().permitAll()
+                        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // OPTIONS 요청 허용
+                        .antMatchers(HttpMethod.POST, "/auth/logout").hasAnyRole("USER", "ADMIN")
+                        .anyRequest().permitAll() // 모든 요청을 허용 (추가 보안 필요 시 제한 가능)
                 );
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+//    @Bean
+//    CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+//        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PATCH", "DELETE", "OPTIONS"));
+//        configuration.setAllowedHeaders(Arrays.asList("*"));
+//        // 로그인 성공시 memberId 를 header 에 전달할 수도 있지만? 다른 방법이 더 낫다고.. 다른 방법을 생각해 봅세.
+//        configuration.setExposedHeaders(Arrays.asList("Authorization", "Location"));
+//        configuration.setAllowCredentials(true);
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        // 로그인 성공시 memberId 를 header 에 전달할 수도 있지만? 다른 방법이 더 낫다고.. 다른 방법을 생각해 봅세.
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "Location"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://127.0.0.1:3000"));  // 모든 오리진 허용
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));  // 허용하는 HTTP 메서드 설정
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "X-Requested-With", "Accept", "content-type"));  // 허용되는 헤더g
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "memberId"));  // 노출할 헤더 추가
+        configuration.setAllowCredentials(true);  // 인증 관련 정보를 허용
+        configuration.addAllowedOriginPattern("*");  // 모든 Origin 허용 (테스트 목적)
+
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration); //모든 경로에 대해 CORS 허용
         return source;
     }
 
@@ -123,6 +119,11 @@ public class SecurityConfig {
             builder.addFilter(jwtAuthenticationFilter)
                     .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class);
         }
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class).build();
     }
 
 }
