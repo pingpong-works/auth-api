@@ -63,7 +63,7 @@ public class EmployeeDto {
     @Getter
     @Setter
     public static class Response {
-        private long id;
+        private long employeeId;
         private String name;
         private String email;
         private String phoneNumber;

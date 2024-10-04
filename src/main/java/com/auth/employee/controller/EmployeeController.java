@@ -65,28 +65,33 @@ public class EmployeeController {
     }
 
     // 특정 회원 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<EmployeeDto.Response> getEmployeeById(@PathVariable Long id, Authentication authentication) {
+    @GetMapping("/employees/{id}")
+    public ResponseEntity<SingleResponseDto<EmployeeDto.Response>> getEmployeeById(@PathVariable Long id, Authentication authentication) {
 
         // Service에서 인증 및 권한 검증 수행
         Employee employee = employeeService.findEmployeeById(id, authentication);
         EmployeeDto.Response response = employeeMapper.employeeToResponseDto(employee);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new SingleResponseDto<>(response));
     }
 
     // 부서별 직원 조회 API
-    @GetMapping("/employees/{departmentId}")
-    public ResponseEntity<Page<Employee>> getEmployeesByDepartment(
+    @GetMapping("/employees/departments/{departmentId}")
+    public ResponseEntity<MultiResponseDto<EmployeeDto.Response>> getEmployeesByDepartment(
             @PathVariable Long departmentId,
             @RequestParam @Positive int page,
             @RequestParam @Positive int size, Authentication authentication) {
 
         // Service에서 인증 및 권한 검증 수행
-        Page<Employee> employees = employeeService.findEmployeesByDepartment(departmentId, page, size, authentication);
+        Page<Employee> pageEmployees = employeeService.findEmployeesByDepartment(departmentId, page - 1, size, authentication);
+        List<EmployeeDto.Response> responseDtos = employeeMapper.employeesToResponseDto(pageEmployees.getContent());
 
-        return ResponseEntity.ok(employees);
+        return new ResponseEntity<>(
+                new MultiResponseDto<>(responseDtos, pageEmployees),
+                HttpStatus.OK
+        );
     }
+
 
     // 내 정보 수정
     @PatchMapping

@@ -2,6 +2,7 @@ package com.auth.department.entity;
 
 import com.auth.audit.Auditable;
 import com.auth.employee.entity.Employee;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -32,5 +33,6 @@ public class Department extends Auditable {
     private String description;
 
     @OneToMany(mappedBy = "department")
+    @JsonManagedReference // 순환 참조 방지
     private List<Employee> employees;
 }

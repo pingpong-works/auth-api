@@ -9,9 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByEmail(String email);
 
-    Page<Employee> findByDepartment(Department department, Pageable pageable);
+    Page<Employee> findByDepartment_Id(Long departmentId, Pageable pageable);
 }
+

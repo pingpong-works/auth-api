@@ -87,7 +87,7 @@ public class EmployeeService extends ExtractMemberEmail {
         Department department = departmentRepository.findById(departmentId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DEPARTMENT_NOT_FOUND));
 
-        return employeeRepository.findByDepartment(department, PageRequest.of(page, size, Sort.by("employeeId").descending()));
+        return employeeRepository.findByDepartment_Id(departmentId, PageRequest.of(page, size, Sort.by("employeeId").descending()));
     }
 
     // 직원 정보 수정 (Patch)
