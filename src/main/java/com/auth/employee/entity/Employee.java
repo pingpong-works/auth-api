@@ -43,6 +43,9 @@ public class Employee extends Auditable {
     @Column(name = "profile_picture", columnDefinition = "TEXT")
     private String profilePicture;
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "employee_rank", length = 20, nullable = false)
+    private EmployeeRank employeeRank;  // 직급 필드 추가
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "employee_status", length = 20, nullable = false)
@@ -55,6 +58,23 @@ public class Employee extends Auditable {
     @JoinColumn(name = "department_id")
     @JsonBackReference // 역참조 관계 설정
     private Department department;
+
+    public enum EmployeeRank {
+        INTERN("인턴"),
+        STAFF("사원"),
+        SENIOR_STAFF("주임"),
+        ASSISTANT_MANAGER("대리"),
+        MANAGER("과장"),
+        SENIOR_MANAGER("차장"),
+        DIRECTOR("부장");
+
+        @Getter
+        private String rankName;
+
+        EmployeeRank(String rankName) {
+            this.rankName = rankName;
+        }
+    }
 
     public enum EmployeeStatus {
         EMPLOYEE_ACTIVE("회원 상태"),
@@ -69,5 +89,4 @@ public class Employee extends Auditable {
             this.status = status;
         }
     }
-
 }

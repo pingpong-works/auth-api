@@ -117,8 +117,11 @@ public class EmployeeController {
     @GetMapping("/employees/my-info")
     public ResponseEntity getMyInfo(@AuthenticationPrincipal Object principal) {
         Employee employee = employeeService.findVerifiedEmployees(principal.toString());
+        EmployeeDto.InfoResponse infoResponse = employeeMapper.employeeToEmployeeInfoResponse(employee);
+        infoResponse.setDepartmentName(employee.getDepartment().getName());
+
         return new ResponseEntity(
-                new SingleResponseDto<>(employeeMapper.employeeToEmployeeInfoResponse(employee)), HttpStatus.OK);
+                new SingleResponseDto<>(infoResponse), HttpStatus.OK);
     }
 
     //비밀번호 변경
