@@ -58,7 +58,7 @@ public interface EmployeeMapper {
         employee.setPassword(postDto.getPassword());  // Password 설정
         employee.setPhoneNumber(postDto.getPhoneNumber());
         employee.setProfilePicture(postDto.getProfilePicture());
-
+        employee.setStatus(Employee.EmployeeStatus.EMPLOYEE_ACTIVE);
         return employee;
     }
 
@@ -77,4 +77,5 @@ public interface EmployeeMapper {
 
         return employee;
     }
+    EmployeeDto.InfoResponse employeeToEmployeeInfoResponse(Employee employee);
 }

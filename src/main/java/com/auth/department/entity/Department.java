@@ -25,7 +25,7 @@ public class Department extends Auditable {
     private Long id;
 
     @NotNull
-    @Column(name = "department_name", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "department_name", nullable = false, length = Integer.MAX_VALUE, unique = true)
     private String name;
 
     @NotNull

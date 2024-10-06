@@ -37,6 +37,9 @@ public class EmployeeService extends ExtractMemberEmail {
         Department department = departmentRepository.findById(employeePostDto.getDepartmentId())
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
+        //직원이 이미 있는 지 검증
+        verifyExistEmployee(employeePostDto.getEmail());
+
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(employeePostDto.getPassword());
         employeePostDto.setPassword(encodedPassword);
@@ -108,6 +111,20 @@ public class EmployeeService extends ExtractMemberEmail {
         return employeeRepository.save(authenticatedEmployee);
     }
 
+    //비밀번호 변경
+    public Employee updatePassword(String email, EmployeeDto.UpdatePassword updatePasswordDto) {
+        Employee employee = employeeRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
+
+        if (!passwordEncoder.matches(updatePasswordDto.getCurrentPassword(), employee.getPassword())) {
+            throw new BusinessLogicException(ExceptionCode.PASSWORD_MISMATCH);
+        }
+
+        String newEncryptedPassword = passwordEncoder.encode(updatePasswordDto.getNewPassword());
+        employee.setPassword(newEncryptedPassword);
+        return employeeRepository.save(employee);
+    }
+
     // 인증된 사용자에서 직원 정보를 추출하는 메서드
     public Employee extractEmployeeFromAuthentication(Authentication authentication, EmployeeRepository employeeRepository) {
         if (authentication == null) {
@@ -117,6 +134,13 @@ public class EmployeeService extends ExtractMemberEmail {
         String email = (String) authentication.getPrincipal();
         return employeeRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
+    }
+
+    public Employee findVerifiedEmployees(String email) {
+        Optional<Employee> optionalEmployee = employeeRepository.findByEmail(email);
+        Employee findEmployee = optionalEmployee.orElseThrow(()
+                -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
+        return findEmployee;
     }
 
     // 직원 존재 여부 검증 (수정됨: 직원이 존재하면 예외 발생)
