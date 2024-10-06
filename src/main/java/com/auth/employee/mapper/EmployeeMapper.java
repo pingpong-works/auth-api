@@ -1,6 +1,5 @@
 package com.auth.employee.mapper;
 
-import com.auth.department.entity.Department;
 import com.auth.employee.dto.EmployeeDto;
 import com.auth.employee.entity.Employee;
 import org.mapstruct.Mapper;
@@ -26,7 +25,7 @@ public interface EmployeeMapper {
         response.setProfilePicture(employee.getProfilePicture());
         response.setCreatedAt(employee.getCreatedAt().toString());  // createdAt을 String으로 변환
         response.setStatus(employee.getStatus());
-
+        response.setEmployeeRank(employee.getEmployeeRank());
         // Department 정보 설정 (departmentName)
         if (employee.getDepartment() != null) {
             response.setDepartmentName(employee.getDepartment().getName());
@@ -59,6 +58,7 @@ public interface EmployeeMapper {
         employee.setPhoneNumber(postDto.getPhoneNumber());
         employee.setProfilePicture(postDto.getProfilePicture());
         employee.setStatus(Employee.EmployeeStatus.EMPLOYEE_ACTIVE);
+        employee.setEmployeeRank(postDto.getEmployeeRank());
         return employee;
     }
 
@@ -71,9 +71,10 @@ public interface EmployeeMapper {
         Employee employee = new Employee();
         employee.setName(patchDto.getName());
         employee.setEmail(patchDto.getEmail());
-        employee.setPassword(patchDto.getPassword());  // Password 설정
         employee.setPhoneNumber(patchDto.getPhoneNumber());
         employee.setProfilePicture(patchDto.getProfilePicture());
+//        employee.setDepartment(department); department는 바깥에서 저장해주고 있음.
+        employee.setEmployeeRank(patchDto.getEmployeeRank());
 
         return employee;
     }
