@@ -37,7 +37,7 @@ public class Employee extends Auditable {
     private String password;
 
     @NotNull
-    @Column(name ="phone_number")
+    @Column(name ="phone_number", unique = true)
     private String phoneNumber;
 
     @Column(name = "profile_picture", columnDefinition = "TEXT")
@@ -45,8 +45,8 @@ public class Employee extends Auditable {
 
 
     @Enumerated(value = EnumType.STRING)
-    @Column(length = 20, nullable = false)
-    private EmployeeStatus status = EmployeeStatus.Employee_ACTIVE;
+    @Column(name = "employee_status", length = 20, nullable = false)
+    private EmployeeStatus status = EmployeeStatus.EMPLOYEE_ACTIVE;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> permissions = new ArrayList<>();
@@ -57,10 +57,10 @@ public class Employee extends Auditable {
     private Department department;
 
     public enum EmployeeStatus {
-        Employee_ACTIVE("회원 상태"),
+        EMPLOYEE_ACTIVE("회원 상태"),
         LOGGED_IN("로그인"),
         LOGGED_OUT("오프라인"),
-        Employee_QUIT("탈퇴 상태");
+        EMPLOYEE_QUIT("탈퇴 상태");
 
         @Getter
         private String status;

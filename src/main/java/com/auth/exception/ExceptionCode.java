@@ -7,6 +7,7 @@ public enum ExceptionCode {
     EMPLOYEE_NOT_FOUND(404, "Employee Not Found"),
     EMPLOYEE_EXIST(409, "Employee Already Exist"),
     DEPARTMENT_NOT_FOUND(404, "Department Not Found"),
+    DEPARTMENT_EXIST(409, "Department Already Exist"),
     NO_CHANGED(404, "No Changed"),
 
     //Access

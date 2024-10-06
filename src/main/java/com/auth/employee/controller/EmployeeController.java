@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -94,7 +95,7 @@ public class EmployeeController {
 
 
     // 내 정보 수정
-    @PatchMapping
+    @PatchMapping("/employees")
     public ResponseEntity patchEmployee(Authentication authentication,
                                         @Valid @RequestBody EmployeeDto.Patch patch,
                                         BindingResult bindingResult) {
@@ -110,5 +111,34 @@ public class EmployeeController {
         return new ResponseEntity<>(
                 new SingleResponseDto<>(employeeMapper.employeeToResponseDto(employee)), HttpStatus.OK
         );
+    }
+
+    //내 정보 조회
+    @GetMapping("/employees/my-info")
+    public ResponseEntity getMyInfo(@AuthenticationPrincipal Object principal) {
+        Employee employee = employeeService.findVerifiedEmployees(principal.toString());
+        return new ResponseEntity(
+                new SingleResponseDto<>(employeeMapper.employeeToEmployeeInfoResponse(employee)), HttpStatus.OK);
+    }
+
+    //비밀번호 변경
+    @PatchMapping("/employees/password")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity updatePassword(Authentication authentication,
+                                         @Valid @RequestBody EmployeeDto.UpdatePassword updatePasswordDto,
+                                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+
+        String email = (String) authentication.getPrincipal();
+        boolean isLoggedOut = !authService.isTokenValid(email);
+        if (isLoggedOut) {
+            return new ResponseEntity<>("User Logged Out", HttpStatus.UNAUTHORIZED);
+        }
+
+        Employee employee = employeeService.updatePassword(email, updatePasswordDto);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
