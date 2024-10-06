@@ -60,14 +60,6 @@ public class EmployeeService extends ExtractMemberEmail {
         return employeeRepository.save(employee);
     }
 
-
-    // 관리자 권한 체크 (이메일로 확인)
-    private void checkAdminAuthority(Authentication authentication) {
-        if (authentication == null || !authentication.getPrincipal().equals("admin@example.com")) {
-            throw new BusinessLogicException(ExceptionCode.ACCESS_DENIED);
-        }
-    }
-
     // 직원 정보 조회 (Admin 권한만 가능)
     public Employee findEmployeeById(Long id, Authentication authentication) {
         checkAdminAuthority(authentication);
@@ -125,6 +117,19 @@ public class EmployeeService extends ExtractMemberEmail {
         return employeeRepository.save(employee);
     }
 
+    //관리자가 직원 삭제
+    @Transactional
+    public void deleteEmployeeById(Long employeeId, Authentication authentication) {
+
+        checkAdminAuthority(authentication);
+
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
+
+        employee.setStatus(Employee.EmployeeStatus.EMPLOYEE_QUIT);
+        employeeRepository.save(employee);
+    }
+
     // 인증된 사용자에서 직원 정보를 추출하는 메서드
     public Employee extractEmployeeFromAuthentication(Authentication authentication, EmployeeRepository employeeRepository) {
         if (authentication == null) {
@@ -148,6 +153,13 @@ public class EmployeeService extends ExtractMemberEmail {
         Optional<Employee> employee = employeeRepository.findByEmail(email);
         if (employee.isPresent()) {
             throw new BusinessLogicException(ExceptionCode.EMPLOYEE_EXIST);
+        }
+    }
+
+    // 관리자 권한 체크 (이메일로 확인)
+    private void checkAdminAuthority(Authentication authentication) {
+        if (authentication == null || !authentication.getPrincipal().equals("admin@example.com")) {
+            throw new BusinessLogicException(ExceptionCode.ACCESS_DENIED);
         }
     }
 }

@@ -144,4 +144,11 @@ public class EmployeeController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    // 직원 삭제(상태 변경) API (관리자만 가능)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id, Authentication authentication) {
+        employeeService.deleteEmployeeById(id, authentication);
+        return ResponseEntity.noContent().build();
+    }
 }
