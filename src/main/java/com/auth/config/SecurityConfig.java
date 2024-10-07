@@ -9,6 +9,7 @@ import com.auth.auth.handler.EmployeeAuthenticationFailureHandler;
 import com.auth.auth.handler.EmployeeAuthenticationSuccessHandler;
 import com.auth.auth.jwt.JwtTokenizer;
 import com.auth.auth.utils.JwtAuthorityUtils;
+import com.auth.employee.repository.EmployeeRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,11 +35,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
     private final JwtTokenizer jwtTokenizer;
     private final JwtAuthorityUtils jwtAuthorityUtils;
+    private final EmployeeRepository employeeRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public SecurityConfig(JwtTokenizer jwtTokenizer, JwtAuthorityUtils jwtAuthorityUtils, RedisTemplate<String, Object> redisTemplate) {
+    public SecurityConfig(JwtTokenizer jwtTokenizer, JwtAuthorityUtils jwtAuthorityUtils, EmployeeRepository employeeRepository, RedisTemplate<String, Object> redisTemplate) {
         this.jwtTokenizer = jwtTokenizer;
         this.jwtAuthorityUtils = jwtAuthorityUtils;
+        this.employeeRepository = employeeRepository;
         this.redisTemplate = redisTemplate;
     }
 
@@ -62,7 +65,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests(authorize -> authorize
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // OPTIONS 요청 허용
-                        .antMatchers(HttpMethod.POST, "/auth/logout").hasAnyRole("USER", "ADMIN")
+                        .antMatchers(HttpMethod.POST, "/logout").permitAll()
                         .anyRequest().permitAll() // 모든 요청을 허용 (추가 보안 필요 시 제한 가능)
                 );
         return http.build();
@@ -94,7 +97,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://127.0.0.1:3000"));  // 모든 오리진 허용
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));  // 허용하는 HTTP 메서드 설정
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "X-Requested-With", "Accept", "content-type"));  // 허용되는 헤더g
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "memberId"));  // 노출할 헤더 추가
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "employeeId"));  // 노출할 헤더 추가
         configuration.setAllowCredentials(true);  // 인증 관련 정보를 허용
         configuration.addAllowedOriginPattern("*");  // 모든 Origin 허용 (테스트 목적)
 
@@ -109,7 +112,7 @@ public class SecurityConfig {
         public void configure (HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager =
                     builder.getSharedObject(AuthenticationManager.class);
-            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer, redisTemplate);
+            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer, employeeRepository, passwordEncoder());
             jwtAuthenticationFilter.setFilterProcessesUrl("/login");
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new EmployeeAuthenticationSuccessHandler());
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new EmployeeAuthenticationFailureHandler());

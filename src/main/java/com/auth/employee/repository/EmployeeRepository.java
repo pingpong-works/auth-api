@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByEmail(String email);
 
-    Page<Employee> findByDepartment_Id(Long departmentId, Pageable pageable);
+    Page<Employee> findByDepartment_IdAndStatusNot(Long departmentId, Employee.EmployeeStatus status, Pageable pageable);
 }
 

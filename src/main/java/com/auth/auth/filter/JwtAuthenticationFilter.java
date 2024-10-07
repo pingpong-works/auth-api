@@ -3,12 +3,16 @@ package com.auth.auth.filter;
 import com.auth.auth.dto.LoginDto;
 import com.auth.auth.jwt.JwtTokenizer;
 import com.auth.employee.entity.Employee;
+import com.auth.employee.repository.EmployeeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -23,17 +27,14 @@ import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenizer jwtTokenizer;
-    private final RedisTemplate redisTemplate;
-
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtTokenizer jwtTokenizer, RedisTemplate redisTemplate) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenizer = jwtTokenizer;
-        this.redisTemplate = redisTemplate;
-    }
+    private final EmployeeRepository employeeRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @SneakyThrows
     @Override
@@ -41,6 +42,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         ObjectMapper objectMapper = new ObjectMapper();
         LoginDto loginDto = objectMapper.readValue(request.getInputStream(), LoginDto.class);
+
+        // 사용자 이메일로 데이터베이스에서 사용자 정보 조회
+        Employee employee = employeeRepository.findByEmail(loginDto.getUsername())
+                .orElseThrow(() -> new AuthenticationException("User not found") {});
+
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(loginDto.getPassword(), employee.getPassword())) {
+            throw new AuthenticationException("Invalid password") {};
+        }
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
@@ -61,6 +71,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setHeader("Authorization", "Bearer " + accessToken);
         response.setHeader("Refresh", refreshToken);
 
+
         this.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
     }
 
@@ -80,6 +91,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     // (6)
     private String delegateRefreshToken(Employee employee, String accessToken) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("username", employee.getEmail());
+        claims.put("permissions", employee.getPermissions());
+
         String subject = employee.getEmail();
         Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
         String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());

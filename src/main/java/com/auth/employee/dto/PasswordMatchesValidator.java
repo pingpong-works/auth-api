@@ -10,9 +10,6 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
         if (obj instanceof EmployeeDto.Post) {
             EmployeeDto.Post dto = (EmployeeDto.Post) obj;
             return dto.getPassword() != null && dto.getPassword().equals(dto.getConfirmPassword());
-        } else if (obj instanceof EmployeeDto.Patch) {
-            EmployeeDto.Patch dto = (EmployeeDto.Patch) obj;
-            return dto.getPassword() != null && dto.getPassword().equals(dto.getConfirmPassword());
         }
         return false;
     }
