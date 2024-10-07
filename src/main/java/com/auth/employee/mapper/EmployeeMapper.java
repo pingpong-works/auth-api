@@ -11,13 +11,12 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface EmployeeMapper {
 
-    // Employee -> EmployeeDto.Response 변환
-    default EmployeeDto.Response employeeToResponseDto(Employee employee) {
+    // 관리자용
+    default EmployeeDto.AdminResponse employeeToAdminResponseDto(Employee employee) {
         if (employee == null) {
             return null;
         }
-
-        EmployeeDto.Response response = new EmployeeDto.Response();
+        EmployeeDto.AdminResponse response = new EmployeeDto.AdminResponse();
         response.setEmployeeId(employee.getEmployeeId());
         response.setName(employee.getName());
         response.setEmail(employee.getEmail());
@@ -40,23 +39,50 @@ public interface EmployeeMapper {
         return response;
     }
 
-    // List<Employee> -> List<EmployeeDto.Response> 변환
-    default List<EmployeeDto.Response> employeesToResponseDto(List<Employee> employees) {
+    //직원 용
+    default EmployeeDto.UserResponse employeeToUserResponseDto(Employee employee) {
+        if (employee == null) {
+            return null;
+        }
+        EmployeeDto.UserResponse response = new EmployeeDto.UserResponse();
+        response.setEmployeeId(employee.getEmployeeId());
+        response.setName(employee.getName());
+        response.setEmail(employee.getEmail());
+        response.setPhoneNumber(employee.getPhoneNumber());
+        response.setEmployeeRank(employee.getEmployeeRank());
+        response.setExtensionNumber(employee.getExtensionNumber());
+        response.setEmergencyNumber(employee.getEmergencyNumber());
+
+        return response;
+    }
+
+    // 관리자 용
+    default List<EmployeeDto.AdminResponse> employeesToAdminResponseDto(List<Employee> employees) {
         if (employees == null) {
             return null;
         }
 
         return employees.stream()
-                .map(this::employeeToResponseDto)
+                .map(this::employeeToAdminResponseDto)
                 .collect(Collectors.toList());
     }
 
-    // EmployeeDto.Post -> Employee 변환
+    // 직원 용
+    default List<EmployeeDto.UserResponse> employeesToUserResponseDto(List<Employee> employees) {
+        if (employees == null) {
+            return null;
+        }
+
+        return employees.stream()
+                .map(this::employeeToUserResponseDto)
+                .collect(Collectors.toList());
+    }
+
+
     default Employee employeePostToEmployee(EmployeeDto.Post postDto) {
         if (postDto == null) {
             return null;
         }
-
         Employee employee = new Employee();
         employee.setName(postDto.getName());
         employee.setEmail(postDto.getEmail());

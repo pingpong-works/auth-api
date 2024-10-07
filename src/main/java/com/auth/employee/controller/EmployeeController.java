@@ -56,7 +56,7 @@ public class EmployeeController {
         String email = authentication.getPrincipal().toString();
         Employee employee = employeeService.findVerifiedEmployee(email);
         return new ResponseEntity<>(
-                new SingleResponseDto<>(employeeMapper.employeeToResponseDto(employee)), HttpStatus.OK
+                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(employee)), HttpStatus.OK
         );
     }
 
@@ -66,13 +66,60 @@ public class EmployeeController {
         String email = authentication.getPrincipal().toString();
         Employee employee = employeeService.findVerifiedEmployee(email);
         return new ResponseEntity<>(
-                new SingleResponseDto<>(employeeMapper.employeeToResponseDto(employee)), HttpStatus.OK
+                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(employee)), HttpStatus.OK
         );
     }
 
-    // 전체 회원 조회
-    @GetMapping("/employees")
-    public ResponseEntity getEmployees(@RequestParam @Positive int page,
+    // 전체 회원 조회 - 관리자용
+    @GetMapping("/admin/employees")
+    public ResponseEntity getEmployeesForAdmin(@RequestParam @Positive int page,
+                                       @RequestParam @Positive int size, Authentication authentication) {
+
+        employeeService.checkAdminAuthority(authentication);
+        // Service에서 인증 및 권한 검증 수행
+        Page<Employee> pageEmployees = employeeService.findEmployees(page - 1, size, authentication);
+        List<Employee> employees = pageEmployees.getContent();
+
+        return new ResponseEntity<>(
+                new MultiResponseDto<>(employeeMapper.employeesToAdminResponseDto(employees), pageEmployees),
+                HttpStatus.OK
+        );
+    }
+
+
+    // 특정 회원 조회 - 관리자용
+    @GetMapping("/admin/employees/{id}")
+    public ResponseEntity<SingleResponseDto<EmployeeDto.AdminResponse>> getEmployeeByIdForAdmin(@PathVariable Long id, Authentication authentication) {
+
+        employeeService.checkAdminAuthority(authentication);
+        // Service에서 인증 및 권한 검증 수행
+        Employee employee = employeeService.findEmployeeById(id, authentication);
+        EmployeeDto.AdminResponse response = employeeMapper.employeeToAdminResponseDto(employee);
+
+        return ResponseEntity.ok(new SingleResponseDto<>(response));
+    }
+
+    // 부서별 직원 조회 - 관리자용
+    @GetMapping("/admin/employees/departments/{departmentId}")
+    public ResponseEntity<MultiResponseDto<EmployeeDto.AdminResponse>> getEmployeesByDepartmentForAdmin(
+            @PathVariable Long departmentId,
+            @RequestParam @Positive int page,
+            @RequestParam @Positive int size, Authentication authentication) {
+
+        employeeService.checkAdminAuthority(authentication);
+        // Service에서 인증 및 권한 검증 수행
+        Page<Employee> pageEmployees = employeeService.findEmployeesByDepartment(departmentId, page - 1, size, authentication);
+        List<EmployeeDto.AdminResponse> responseDtos = employeeMapper.employeesToAdminResponseDto(pageEmployees.getContent());
+
+        return new ResponseEntity<>(
+                new MultiResponseDto<>(responseDtos, pageEmployees),
+                HttpStatus.OK
+        );
+    }
+
+    // 전체 회원 조회 - 직원용
+    @GetMapping("/user/employees")
+    public ResponseEntity getEmployeesForUser(@RequestParam @Positive int page,
                                        @RequestParam @Positive int size, Authentication authentication) {
 
         // Service에서 인증 및 권한 검증 수행
@@ -80,32 +127,33 @@ public class EmployeeController {
         List<Employee> employees = pageEmployees.getContent();
 
         return new ResponseEntity<>(
-                new MultiResponseDto<>(employeeMapper.employeesToResponseDto(employees), pageEmployees),
+                new MultiResponseDto<>(employeeMapper.employeesToUserResponseDto(employees), pageEmployees),
                 HttpStatus.OK
         );
     }
 
-    // 특정 회원 조회
-    @GetMapping("/employees/{id}")
-    public ResponseEntity<SingleResponseDto<EmployeeDto.Response>> getEmployeeById(@PathVariable Long id, Authentication authentication) {
+
+    // 특정 회원 조회 - 직원용
+    @GetMapping("/user/employees/{id}")
+    public ResponseEntity<SingleResponseDto<EmployeeDto.UserResponse>> getEmployeeByIdForUser(@PathVariable Long id, Authentication authentication) {
 
         // Service에서 인증 및 권한 검증 수행
         Employee employee = employeeService.findEmployeeById(id, authentication);
-        EmployeeDto.Response response = employeeMapper.employeeToResponseDto(employee);
+        EmployeeDto.UserResponse response = employeeMapper.employeeToUserResponseDto(employee);
 
         return ResponseEntity.ok(new SingleResponseDto<>(response));
     }
 
-    // 부서별 직원 조회
-    @GetMapping("/employees/departments/{departmentId}")
-    public ResponseEntity<MultiResponseDto<EmployeeDto.Response>> getEmployeesByDepartment(
+    // 부서별 직원 조회 - 직원용
+    @GetMapping("/user/employees/departments/{departmentId}")
+    public ResponseEntity<MultiResponseDto<EmployeeDto.UserResponse>> getEmployeesByDepartmentForUser(
             @PathVariable Long departmentId,
             @RequestParam @Positive int page,
             @RequestParam @Positive int size, Authentication authentication) {
 
         // Service에서 인증 및 권한 검증 수행
         Page<Employee> pageEmployees = employeeService.findEmployeesByDepartment(departmentId, page - 1, size, authentication);
-        List<EmployeeDto.Response> responseDtos = employeeMapper.employeesToResponseDto(pageEmployees.getContent());
+        List<EmployeeDto.UserResponse> responseDtos = employeeMapper.employeesToUserResponseDto(pageEmployees.getContent());
 
         return new ResponseEntity<>(
                 new MultiResponseDto<>(responseDtos, pageEmployees),
@@ -129,7 +177,7 @@ public class EmployeeController {
         Employee employee = employeeService.updateEmployee(employeeMapper.employeePatchToEmployee(patch), authentication);
 
         return new ResponseEntity<>(
-                new SingleResponseDto<>(employeeMapper.employeeToResponseDto(employee)), HttpStatus.OK
+                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(employee)), HttpStatus.OK
         );
     }
 
