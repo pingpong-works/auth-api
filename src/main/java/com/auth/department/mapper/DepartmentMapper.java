@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface DepartmentMapper {
 
-    Department toEntity(DepartmentDto departmentDto);
-    DepartmentDto toDto(Department department);
-    List<DepartmentDto> departmentDtoList (List<Department> entity);
+    Department toEntity(DepartmentDto.Post departmentPostDto);
+    DepartmentDto.Post toDto(Department department);
+    List<DepartmentDto.Response> departmentDtoList (List<Department> entity);
 }

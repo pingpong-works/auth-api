@@ -19,17 +19,17 @@ public class DepartmentService {
     public final DepartmentMapper departmentMapper;
 
 
-    public DepartmentDto createDepartment(DepartmentDto departmentDto) {
-        if (departmentRepository.existsByName(departmentDto.getName())) {
+    public DepartmentDto.Post createDepartment(DepartmentDto.Post departmentPostDto) {
+        if (departmentRepository.existsByName(departmentPostDto.getName())) {
             throw new BusinessLogicException(ExceptionCode.DEPARTMENT_EXIST);
         }
 
-        Department department = departmentMapper.toEntity(departmentDto);
+        Department department = departmentMapper.toEntity(departmentPostDto);
         Department savedDepartment = departmentRepository.save(department);
         return departmentMapper.toDto(savedDepartment);
     }
 
-    public List<DepartmentDto> findAll() {
+    public List<DepartmentDto.Response> findAll() {
         return departmentMapper.departmentDtoList(departmentRepository.findAll());
     }
 }

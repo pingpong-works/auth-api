@@ -17,13 +17,13 @@ public class DepartmentController {
     private final DepartmentService departmentService;
 
     @PostMapping
-    public ResponseEntity<DepartmentDto> createDepartment(@RequestBody DepartmentDto departmentDto) {
-        DepartmentDto createdDepartment = departmentService.createDepartment(departmentDto);
+    public ResponseEntity<DepartmentDto.Post> createDepartment(@RequestBody DepartmentDto.Post departmentDto) {
+        DepartmentDto.Post createdDepartment = departmentService.createDepartment(departmentDto);
         return new ResponseEntity<>(createdDepartment, HttpStatus.CREATED);
     }
 
     @GetMapping("/all")
-    public List<DepartmentDto> getDepartments() {
+    public List<DepartmentDto.Response> getDepartments() {
         return departmentService.findAll();
     }
 }
