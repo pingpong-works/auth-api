@@ -77,7 +77,7 @@ public class EmployeeService extends ExtractMemberEmail {
 
     // 직원 정보 조회 (Admin 권한만 가능)
     public Employee findEmployeeById(Long id, Authentication authentication) {
-        checkAdminAuthority(authentication);
+//        checkAdminAuthority(authentication);
 
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
@@ -85,14 +85,14 @@ public class EmployeeService extends ExtractMemberEmail {
 
     // 전체 직원 조회
     public Page<Employee> findEmployees(int page, int size, Authentication authentication) {
-        checkAdminAuthority(authentication);
+//        checkAdminAuthority(authentication);
 
         return employeeRepository.findAll(PageRequest.of(page, size, Sort.by("employeeId").descending()));
     }
 
     // 부서별 직원 조회 로직 -관리자 및 직원 나누기.
     public Page<Employee> findEmployeesByDepartment(Long departmentId, int page, int size, Authentication authentication) {
-        checkAdminAuthority(authentication);
+//        checkAdminAuthority(authentication);
 
         Department department = departmentRepository.findById(departmentId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DEPARTMENT_NOT_FOUND));
@@ -211,7 +211,7 @@ public class EmployeeService extends ExtractMemberEmail {
     }
 
     // 관리자 권한 체크 (이메일로 확인)
-    private void checkAdminAuthority(Authentication authentication) {
+    public void checkAdminAuthority(Authentication authentication) {
         if (authentication == null || !authentication.getPrincipal().equals("admin@example.com")) {
             throw new BusinessLogicException(ExceptionCode.ACCESS_DENIED);
         }

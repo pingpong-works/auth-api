@@ -82,7 +82,7 @@ public class EmployeeDto {
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class Response {
+    public static class AdminResponse {
         private long employeeId;
         private String name;
         private String email;
@@ -97,6 +97,20 @@ public class EmployeeDto {
         private Employee.AttendanceStatus attendanceStatus;
         private String departmentName;
         private Employee.EmployeeRank employeeRank;
+    }
+
+    // Response DTO (Employee 응답용)
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class UserResponse {
+        private long employeeId;
+        private String name;
+        private String email;
+        private String phoneNumber;
+        private Employee.EmployeeRank employeeRank;
+        private String extensionNumber;
+        private String emergencyNumber;
     }
 
     @Getter
