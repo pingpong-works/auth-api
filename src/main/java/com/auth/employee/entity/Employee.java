@@ -40,6 +40,18 @@ public class Employee extends Auditable {
     @Column(name ="phone_number", unique = true)
     private String phoneNumber;
 
+    @Column(nullable = false)
+    private String extensionNumber;
+
+    @Column(nullable = true)
+    private String emergencyNumber;
+
+    @Column(nullable = true)
+    private String address;
+
+    @Column(nullable = true)
+    private String vehicleNumber;
+
     @Column(name = "profile_picture", columnDefinition = "TEXT")
     private String profilePicture;
 
@@ -50,6 +62,10 @@ public class Employee extends Auditable {
     @Enumerated(value = EnumType.STRING)
     @Column(name = "employee_status", length = 20, nullable = false)
     private EmployeeStatus status = EmployeeStatus.EMPLOYEE_ACTIVE;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "attendance_status", length = 20, nullable = false)
+    private AttendanceStatus attendanceStatus = AttendanceStatus.CLOCKED_OUT;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> permissions = new ArrayList<>();
@@ -86,6 +102,18 @@ public class Employee extends Auditable {
         private String status;
 
         EmployeeStatus(String status) {
+            this.status = status;
+        }
+    }
+
+    public enum AttendanceStatus {
+        CLOCKED_IN("출근 상태"),
+        CLOCKED_OUT("퇴근 상태");
+
+        @Getter
+        private String status;
+
+        AttendanceStatus(String status) {
             this.status = status;
         }
     }

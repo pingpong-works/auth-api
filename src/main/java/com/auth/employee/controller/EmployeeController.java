@@ -50,6 +50,26 @@ public class EmployeeController {
         return ResponseEntity.created(location).build();
     }
 
+    @PatchMapping("/employees/clock-in")
+    public ResponseEntity clockIn(Authentication authentication) {
+        employeeService.clockIn(authentication);
+        String email = authentication.getPrincipal().toString();
+        Employee employee = employeeService.findVerifiedEmployee(email);
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMapper.employeeToResponseDto(employee)), HttpStatus.OK
+        );
+    }
+
+    @PatchMapping("/employees/clock-out")
+    public ResponseEntity clockOut(Authentication authentication) {
+        employeeService.clockOut(authentication);
+        String email = authentication.getPrincipal().toString();
+        Employee employee = employeeService.findVerifiedEmployee(email);
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMapper.employeeToResponseDto(employee)), HttpStatus.OK
+        );
+    }
+
     // 전체 회원 조회
     @GetMapping("/employees")
     public ResponseEntity getEmployees(@RequestParam @Positive int page,
@@ -76,7 +96,7 @@ public class EmployeeController {
         return ResponseEntity.ok(new SingleResponseDto<>(response));
     }
 
-    // 부서별 직원 조회 API
+    // 부서별 직원 조회
     @GetMapping("/employees/departments/{departmentId}")
     public ResponseEntity<MultiResponseDto<EmployeeDto.Response>> getEmployeesByDepartment(
             @PathVariable Long departmentId,
@@ -116,7 +136,7 @@ public class EmployeeController {
     //내 정보 조회
     @GetMapping("/employees/my-info")
     public ResponseEntity getMyInfo(@AuthenticationPrincipal Object principal) {
-        Employee employee = employeeService.findVerifiedEmployees(principal.toString());
+        Employee employee = employeeService.findVerifiedEmployee(principal.toString());
         EmployeeDto.InfoResponse infoResponse = employeeMapper.employeeToEmployeeInfoResponse(employee);
         infoResponse.setDepartmentName(employee.getDepartment().getName());
 
@@ -146,7 +166,7 @@ public class EmployeeController {
     }
 
     // 직원 삭제(상태 변경) API (관리자만 가능)
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/employees/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id, Authentication authentication) {
         employeeService.deleteEmployeeById(id, authentication);
         return ResponseEntity.noContent().build();

@@ -43,6 +43,8 @@ public class EmployeeDto {
         @Pattern(regexp = "^(010-\\d{4}-\\d{4}|010\\d{8})$", message = "휴대폰 번호는 '010-XXXX-XXXX' 또는 '010XXXXXXXX' 형식이어야 합니다.")
         private String phoneNumber;
 
+        private String extensionNumber;
+
         private String profilePicture;
 
         @NotNull
@@ -56,7 +58,6 @@ public class EmployeeDto {
     @Getter
     @Setter
     @NoArgsConstructor
-    @PasswordMatches
     public static class Patch {
 
         @Pattern(regexp = "^[가-힣]+$", message = "이름은 한글만 입력 가능합니다.")
@@ -68,17 +69,12 @@ public class EmployeeDto {
         @Pattern(regexp = "^(010-\\d{4}-\\d{4}|010\\d{8})$", message = "휴대폰 번호는 '010-XXXX-XXXX' 또는 '010XXXXXXXX' 형식이어야 합니다.")
         private String phoneNumber;
 
-        @Size(min = 8, max = 20, message = "비밀번호는 8자에서 20자 사이여야 합니다.")
-        @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?`~]+$",
-                message = "비밀번호는 알파벳, 숫자, 특수문자만 포함할 수 있습니다.")
-        private String password;
-
-        private String confirmPassword;
-
+        private String extensionNumber;
+        private String emergencyNumber;
+        private String address;
+        private String vehicleNumber;
         private String profilePicture;
-
         private Long departmentId;
-
         private Employee.EmployeeRank employeeRank;
     }
 
@@ -92,8 +88,13 @@ public class EmployeeDto {
         private String email;
         private String phoneNumber;
         private String profilePicture;
+        private String extensionNumber;
+        private String emergencyNumber;
+        private String address;
+        private String vehicleNumber;
         private String createdAt;
         private Employee.EmployeeStatus status;
+        private Employee.AttendanceStatus attendanceStatus;
         private String departmentName;
         private Employee.EmployeeRank employeeRank;
     }
@@ -125,8 +126,13 @@ public class EmployeeDto {
         private String profilePicture;
         private String departmentName;
         private String phoneNumber;
+        private String extensionNumber;
+        private String emergencyNumber;
+        private String address;
+        private String vehicleNumber;
         private String createdAt;
         private Employee.EmployeeRank employeeRank;
         private Employee.EmployeeStatus status;
+        private Employee.AttendanceStatus attendanceStatus;
     }
 }

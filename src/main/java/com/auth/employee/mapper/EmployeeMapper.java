@@ -25,7 +25,13 @@ public interface EmployeeMapper {
         response.setProfilePicture(employee.getProfilePicture());
         response.setCreatedAt(employee.getCreatedAt().toString());  // createdAt을 String으로 변환
         response.setStatus(employee.getStatus());
+        response.setAttendanceStatus(employee.getAttendanceStatus());
         response.setEmployeeRank(employee.getEmployeeRank());
+        // 추가된 필드 설정
+        response.setExtensionNumber(employee.getExtensionNumber());
+        response.setEmergencyNumber(employee.getEmergencyNumber());
+        response.setAddress(employee.getAddress());
+        response.setVehicleNumber(employee.getVehicleNumber());
         // Department 정보 설정 (departmentName)
         if (employee.getDepartment() != null) {
             response.setDepartmentName(employee.getDepartment().getName());
@@ -54,11 +60,13 @@ public interface EmployeeMapper {
         Employee employee = new Employee();
         employee.setName(postDto.getName());
         employee.setEmail(postDto.getEmail());
-        employee.setPassword(postDto.getPassword());  // Password 설정
+        employee.setPassword(postDto.getPassword());
         employee.setPhoneNumber(postDto.getPhoneNumber());
         employee.setProfilePicture(postDto.getProfilePicture());
         employee.setStatus(Employee.EmployeeStatus.EMPLOYEE_ACTIVE);
         employee.setEmployeeRank(postDto.getEmployeeRank());
+        employee.setExtensionNumber(postDto.getExtensionNumber());
+
         return employee;
     }
 
@@ -73,10 +81,16 @@ public interface EmployeeMapper {
         employee.setEmail(patchDto.getEmail());
         employee.setPhoneNumber(patchDto.getPhoneNumber());
         employee.setProfilePicture(patchDto.getProfilePicture());
-//        employee.setDepartment(department); department는 바깥에서 저장해주고 있음.
         employee.setEmployeeRank(patchDto.getEmployeeRank());
+        // 추가된 필드 설정
+        employee.setExtensionNumber(patchDto.getExtensionNumber());
+        employee.setEmergencyNumber(patchDto.getEmergencyNumber());
+        employee.setAddress(patchDto.getAddress());
+        employee.setVehicleNumber(patchDto.getVehicleNumber());
 
         return employee;
     }
+
     EmployeeDto.InfoResponse employeeToEmployeeInfoResponse(Employee employee);
 }
+

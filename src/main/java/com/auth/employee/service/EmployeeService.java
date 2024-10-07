@@ -56,8 +56,23 @@ public class EmployeeService extends ExtractMemberEmail {
             employee.getPermissions().add("ROLE_ADMIN");
         }
 
-        // 직원 저장
         return employeeRepository.save(employee);
+    }
+
+    //출근
+    public void clockIn(Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        Employee employee = findVerifiedEmployee(email);
+        employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_IN);
+        employeeRepository.save(employee);
+    }
+
+    //퇴근
+    public void clockOut(Authentication authentication) {
+        String email = authentication.getPrincipal().toString();
+        Employee employee = findVerifiedEmployee(email);
+        employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_OUT);
+        employeeRepository.save(employee);
     }
 
     // 직원 정보 조회 (Admin 권한만 가능)
@@ -75,33 +90,72 @@ public class EmployeeService extends ExtractMemberEmail {
         return employeeRepository.findAll(PageRequest.of(page, size, Sort.by("employeeId").descending()));
     }
 
-    // 부서별 직원 조회 로직
+    // 부서별 직원 조회 로직 -관리자 및 직원 나누기.
     public Page<Employee> findEmployeesByDepartment(Long departmentId, int page, int size, Authentication authentication) {
         checkAdminAuthority(authentication);
 
         Department department = departmentRepository.findById(departmentId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DEPARTMENT_NOT_FOUND));
 
-        return employeeRepository.findByDepartment_Id(departmentId, PageRequest.of(page, size, Sort.by("employeeId").descending()));
+        return employeeRepository.findByDepartment_IdAndStatusNot(
+                departmentId,
+                Employee.EmployeeStatus.EMPLOYEE_QUIT,  // EMPLOYEE_QUIT 상태를 제외
+                PageRequest.of(page, size, Sort.by("employeeId").descending())
+        );
     }
 
     // 직원 정보 수정 (Patch)
     public Employee updateEmployee(Employee employee, Authentication authentication) {
         Employee authenticatedEmployee = extractEmployeeFromAuthentication(authentication, employeeRepository);
 
-        // 비밀번호 업데이트
-        if (employee.getPassword() != null && !passwordEncoder.matches(employee.getPassword(), authenticatedEmployee.getPassword())) {
-            String encryptedPassword = passwordEncoder.encode(employee.getPassword()); // 비밀번호 암호화
-            authenticatedEmployee.setPassword(encryptedPassword); // 암호화된 비밀번호로 설정
-        }
-
         // 이름 업데이트
-        if (employee.getName() != null && !employee.getName().equals(authenticatedEmployee.getName())) {
-            authenticatedEmployee.setName(employee.getName());
-        }
+        Optional.ofNullable(employee.getName())
+                .filter(name -> !name.equals(authenticatedEmployee.getName()))
+                .ifPresent(authenticatedEmployee::setName);
+
+        // 이메일 업데이트
+        Optional.ofNullable(employee.getEmail())
+                .filter(email -> !email.equals(authenticatedEmployee.getEmail()))
+                .ifPresent(authenticatedEmployee::setEmail);
+
+        // 휴대폰 번호 업데이트
+        Optional.ofNullable(employee.getPhoneNumber())
+                .filter(phoneNumber -> !phoneNumber.equals(authenticatedEmployee.getPhoneNumber()))
+                .ifPresent(authenticatedEmployee::setPhoneNumber);
+
+        // 프로필 사진 업데이트
+        Optional.ofNullable(employee.getProfilePicture())
+                .filter(profilePicture -> !profilePicture.equals(authenticatedEmployee.getProfilePicture()))
+                .ifPresent(authenticatedEmployee::setProfilePicture);
+
+        // 내선 번호 업데이트
+        Optional.ofNullable(employee.getExtensionNumber())
+                .filter(extensionNumber -> !extensionNumber.equals(authenticatedEmployee.getExtensionNumber()))
+                .ifPresent(authenticatedEmployee::setExtensionNumber);
+
+        // 긴급 연락망 업데이트
+        Optional.ofNullable(employee.getEmergencyNumber())
+                .filter(emergencyNumber -> !emergencyNumber.equals(authenticatedEmployee.getEmergencyNumber()))
+                .ifPresent(authenticatedEmployee::setEmergencyNumber);
+
+        // 주소 업데이트
+        Optional.ofNullable(employee.getAddress())
+                .filter(address -> !address.equals(authenticatedEmployee.getAddress()))
+                .ifPresent(authenticatedEmployee::setAddress);
+
+        // 차량 번호 업데이트
+        Optional.ofNullable(employee.getVehicleNumber())
+                .filter(vehicleNumber -> !vehicleNumber.equals(authenticatedEmployee.getVehicleNumber()))
+                .ifPresent(authenticatedEmployee::setVehicleNumber);
+
+        // 직급 업데이트
+        Optional.ofNullable(employee.getEmployeeRank())
+                .filter(employeeRank -> !employeeRank.equals(authenticatedEmployee.getEmployeeRank()))
+                .ifPresent(authenticatedEmployee::setEmployeeRank);
 
         return employeeRepository.save(authenticatedEmployee);
     }
+
 
     //비밀번호 변경
     public Employee updatePassword(String email, EmployeeDto.UpdatePassword updatePasswordDto) {
@@ -141,7 +195,7 @@ public class EmployeeService extends ExtractMemberEmail {
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
     }
 
-    public Employee findVerifiedEmployees(String email) {
+    public Employee findVerifiedEmployee(String email) {
         Optional<Employee> optionalEmployee = employeeRepository.findByEmail(email);
         Employee findEmployee = optionalEmployee.orElseThrow(()
                 -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
