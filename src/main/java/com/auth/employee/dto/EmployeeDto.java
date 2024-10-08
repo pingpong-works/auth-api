@@ -78,7 +78,7 @@ public class EmployeeDto {
         private Employee.EmployeeRank employeeRank;
     }
 
-    // Response DTO (Employee 응답용)
+    // Response DTO (Admin 응답용)
     @Getter
     @Setter
     @NoArgsConstructor
@@ -96,7 +96,7 @@ public class EmployeeDto {
         private Employee.EmployeeStatus status;
         private Employee.AttendanceStatus attendanceStatus;
         private String departmentName;
-        private Employee.EmployeeRank employeeRank;
+        private String employeeRank;
     }
 
     // Response DTO (Employee 응답용)
@@ -147,8 +147,8 @@ public class EmployeeDto {
         private String address;
         private String vehicleNumber;
         private String createdAt;
-        private Employee.EmployeeRank employeeRank;
-        private Employee.EmployeeStatus status;
-        private Employee.AttendanceStatus attendanceStatus;
+        private String employeeRank;
+        private String status;
+        private String attendanceStatus;
     }
 }

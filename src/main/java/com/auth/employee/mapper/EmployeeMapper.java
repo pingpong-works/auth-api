@@ -25,7 +25,7 @@ public interface EmployeeMapper {
         response.setCreatedAt(employee.getCreatedAt().toString());  // createdAt을 String으로 변환
         response.setStatus(employee.getStatus());
         response.setAttendanceStatus(employee.getAttendanceStatus());
-        response.setEmployeeRank(employee.getEmployeeRank());
+        response.setEmployeeRank(employee.getEmployeeRank().toString());
         // 추가된 필드 설정
         response.setExtensionNumber(employee.getExtensionNumber());
         response.setEmergencyNumber(employee.getEmergencyNumber());
@@ -118,6 +118,28 @@ public interface EmployeeMapper {
         return employee;
     }
 
-    EmployeeDto.InfoResponse employeeToEmployeeInfoResponse(Employee employee);
+    default EmployeeDto.InfoResponse employeeToEmployeeInfoResponse(Employee employee) {
+        if (employee == null) {
+            return null;
+        }
+
+        EmployeeDto.InfoResponse response = new EmployeeDto.InfoResponse();
+        response.setEmployeeId(employee.getEmployeeId());
+        response.setName(employee.getName());
+        response.setEmail(employee.getEmail());
+        response.setProfilePicture(employee.getProfilePicture());
+        response.setDepartmentName(employee.getDepartment().toString());
+        response.setPhoneNumber(employee.getPhoneNumber());
+        response.setExtensionNumber(employee.getExtensionNumber());
+        response.setEmergencyNumber(employee.getEmergencyNumber());
+        response.setAddress(employee.getAddress());
+        response.setVehicleNumber(employee.getVehicleNumber());
+        response.setCreatedAt(employee.getCreatedAt().toString());
+        response.setEmployeeRank(employee.getEmployeeRank().getRankName());
+        response.setStatus(employee.getStatus().getStatus());
+        response.setAttendanceStatus(employee.getAttendanceStatus().getStatus());
+
+        return response;
+    }
 }
 
