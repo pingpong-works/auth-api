@@ -50,23 +50,23 @@ public class EmployeeController {
         return ResponseEntity.created(location).build();
     }
 
-    @PatchMapping("/employees/clock-in")
-    public ResponseEntity clockIn(Authentication authentication) {
-        employeeService.clockIn(authentication);
+    //출퇴근 요청
+    @PostMapping("/employees/attendance")
+    public ResponseEntity toggleAttendance(Authentication authentication) {
         String email = authentication.getPrincipal().toString();
         Employee employee = employeeService.findVerifiedEmployee(email);
-        return new ResponseEntity<>(
-                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(employee)), HttpStatus.OK
-        );
-    }
 
-    @PatchMapping("/employees/clock-out")
-    public ResponseEntity clockOut(Authentication authentication) {
-        employeeService.clockOut(authentication);
-        String email = authentication.getPrincipal().toString();
-        Employee employee = employeeService.findVerifiedEmployee(email);
+        // 현재 출퇴근 상태에 따라 반대 상태로 토글
+        if (employee.getAttendanceStatus() == Employee.AttendanceStatus.CLOCKED_IN) {
+            employeeService.clockOut(employee);
+        } else {
+            employeeService.clockIn(employee);
+        }
+
+        // 업데이트된 상태 반환
         return new ResponseEntity<>(
-                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(employee)), HttpStatus.OK
+                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(employee)),
+                HttpStatus.OK
         );
     }
 

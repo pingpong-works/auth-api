@@ -35,7 +35,7 @@ public class EmployeeService extends ExtractMemberEmail {
     // 직원 생성
     public Employee createEmployee(EmployeeDto.Post employeePostDto) {
         Department department = departmentRepository.findById(employeePostDto.getDepartmentId())
-                .orElseThrow(() -> new RuntimeException("Department not found"));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DEPARTMENT_NOT_FOUND));
 
         //직원이 이미 있는 지 검증
         verifyExistEmployee(employeePostDto.getEmail());
@@ -59,18 +59,14 @@ public class EmployeeService extends ExtractMemberEmail {
         return employeeRepository.save(employee);
     }
 
-    //출근
-    public void clockIn(Authentication authentication) {
-        String email = authentication.getPrincipal().toString();
-        Employee employee = findVerifiedEmployee(email);
+    // 출근 처리
+    public void clockIn(Employee employee) {
         employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_IN);
         employeeRepository.save(employee);
     }
 
-    //퇴근
-    public void clockOut(Authentication authentication) {
-        String email = authentication.getPrincipal().toString();
-        Employee employee = findVerifiedEmployee(email);
+    // 퇴근 처리
+    public void clockOut(Employee employee) {
         employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_OUT);
         employeeRepository.save(employee);
     }

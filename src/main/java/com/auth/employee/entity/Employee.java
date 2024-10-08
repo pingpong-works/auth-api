@@ -107,8 +107,8 @@ public class Employee extends Auditable {
     }
 
     public enum AttendanceStatus {
-        CLOCKED_IN("출근 상태"),
-        CLOCKED_OUT("퇴근 상태");
+        CLOCKED_IN("출근"),
+        CLOCKED_OUT("퇴근");
 
         @Getter
         private String status;
