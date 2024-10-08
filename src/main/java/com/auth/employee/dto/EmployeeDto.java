@@ -103,14 +103,16 @@ public class EmployeeDto {
     @Getter
     @Setter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class UserResponse {
-        private long employeeId;
+        private Long employeeId;
         private String name;
         private String email;
         private String phoneNumber;
-        private Employee.EmployeeRank employeeRank;
+        private String employeeRank;
         private String extensionNumber;
         private String emergencyNumber;
+        private String departmentName;
     }
 
     @Getter
