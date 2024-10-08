@@ -49,9 +49,10 @@ public interface EmployeeMapper {
         response.setName(employee.getName());
         response.setEmail(employee.getEmail());
         response.setPhoneNumber(employee.getPhoneNumber());
-        response.setEmployeeRank(employee.getEmployeeRank());
+        response.setEmployeeRank(employee.getEmployeeRank().toString());
         response.setExtensionNumber(employee.getExtensionNumber());
         response.setEmergencyNumber(employee.getEmergencyNumber());
+        response.setDepartmentName(employee.getDepartment().getName()) ;
 
         return response;
     }
