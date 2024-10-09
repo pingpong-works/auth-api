@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -211,5 +212,9 @@ public class EmployeeService extends ExtractMemberEmail {
         if (authentication == null || !authentication.getPrincipal().equals("admin@example.com")) {
             throw new BusinessLogicException(ExceptionCode.ACCESS_DENIED);
         }
+    }
+
+    public List<Long> getTotalEmployeeIds() {
+       return employeeRepository.findAllEmployeeIds();
     }
 }
