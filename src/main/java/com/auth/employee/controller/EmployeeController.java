@@ -219,4 +219,10 @@ public class EmployeeController {
         employeeService.deleteEmployeeById(id, authentication);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/employees")
+    public ResponseEntity getEmployeeIds (Authentication authentication) {
+        List<Long> ids = employeeService.getTotalEmployeeIds();
+        return new ResponseEntity<>(ids, HttpStatus.OK);
+    }
 }
