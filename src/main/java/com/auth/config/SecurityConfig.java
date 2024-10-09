@@ -50,9 +50,10 @@ public class SecurityConfig {
         http
                 .headers().frameOptions().sameOrigin()
                 .and()
+                .cors()
+                .and()
                 .csrf().disable()
                 .logout().disable()  // 직접 구현한 로그아웃 사용
-                .cors(withDefaults())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .formLogin().disable()
@@ -94,7 +95,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://127.0.0.1:3000"));  // 모든 오리진 허용
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));  // 모든 오리진 허용
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE", "OPTIONS"));  // 허용하는 HTTP 메서드 설정
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "X-Requested-With", "Accept", "content-type"));  // 허용되는 헤더g
         configuration.setExposedHeaders(Arrays.asList("Authorization", "employeeId"));  // 노출할 헤더 추가
