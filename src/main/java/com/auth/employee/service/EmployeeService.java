@@ -217,4 +217,8 @@ public class EmployeeService extends ExtractMemberEmail {
     public List<Long> getTotalEmployeeIds() {
        return employeeRepository.findAllEmployeeIds();
     }
+
+    public List<Long> getEmployeeIdsByDepartment(Long departmentId) {
+        return employeeRepository.findIdByDepartment(departmentId);
+    }
 }
