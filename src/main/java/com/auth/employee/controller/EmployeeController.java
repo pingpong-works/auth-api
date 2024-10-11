@@ -7,6 +7,7 @@ import com.auth.dto.SingleResponseDto;
 import com.auth.employee.dto.EmployeeDto;
 import com.auth.employee.entity.Employee;
 import com.auth.employee.mapper.EmployeeMapper;
+import com.auth.employee.repository.EmployeeRepository;
 import com.auth.employee.service.EmployeeService;
 import com.auth.utils.UriCreator;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,6 +34,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final EmployeeMapper employeeMapper;
     private final AuthService authService;
+    private final EmployeeRepository employeeRepository;
 
     // 회원가입 완료
     @PostMapping("/signup")

@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByEmail(String email);
 
+    Optional<Employee> findByPhoneNumber(String phoneNumber);
+
     Page<Employee> findByDepartment_IdAndStatusNot(Long departmentId, Employee.EmployeeStatus status, Pageable pageable);
 
     // 전체 직원 id 조회
