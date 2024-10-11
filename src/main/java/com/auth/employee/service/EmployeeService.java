@@ -11,6 +11,7 @@ import com.auth.exception.ExceptionCode;
 import com.auth.utils.ExtractMemberEmail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -40,6 +42,7 @@ public class EmployeeService extends ExtractMemberEmail {
 
         //직원이 이미 있는 지 검증
         verifyExistEmployee(employeePostDto.getEmail());
+        verifyExistPhoneNumber(employeePostDto.getPhoneNumber());
 
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(employeePostDto.getPassword());
@@ -74,22 +77,32 @@ public class EmployeeService extends ExtractMemberEmail {
 
     // 직원 정보 조회 (Admin 권한만 가능)
     public Employee findEmployeeById(Long id, Authentication authentication) {
-//        checkAdminAuthority(authentication);
 
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
     }
 
     // 전체 직원 조회
+//    public Page<Employee> findEmployees(int page, int size, Authentication authentication) {
+//
+//        return employeeRepository.findAll(PageRequest.of(page, size, Sort.by("employeeId").descending()));
+//    }
     public Page<Employee> findEmployees(int page, int size, Authentication authentication) {
-//        checkAdminAuthority(authentication);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("employeeId").ascending());
+        Page<Employee> allEmployees = employeeRepository.findAll(pageRequest);
 
-        return employeeRepository.findAll(PageRequest.of(page, size, Sort.by("employeeId").descending()));
+        // 관리자 이메일인 admin@example.com을 제외하고 필터링
+        List<Employee> filteredEmployees = allEmployees.stream()
+                .filter(employee -> !"admin@example.com".equals(employee.getEmail())) // 관리자 이메일 제외
+                .collect(Collectors.toList());
+
+        // 필터링된 직원 리스트로 다시 Page 객체 생성
+        return new PageImpl<>(filteredEmployees, pageRequest, filteredEmployees.size());
     }
+
 
     // 부서별 직원 조회 로직 -관리자 및 직원 나누기.
     public Page<Employee> findEmployeesByDepartment(Long departmentId, int page, int size, Authentication authentication) {
-//        checkAdminAuthority(authentication);
 
         Department department = departmentRepository.findById(departmentId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DEPARTMENT_NOT_FOUND));
@@ -216,5 +229,13 @@ public class EmployeeService extends ExtractMemberEmail {
 
     public List<Long> getTotalEmployeeIds() {
        return employeeRepository.findAllEmployeeIds();
+    }
+
+    //전화 번호 유효성 체크
+    private void verifyExistPhoneNumber(String phoneNumber) {
+        Optional<Employee> employee = employeeRepository.findByPhoneNumber(phoneNumber);
+        if(employee.isPresent()) {
+            throw new BusinessLogicException(ExceptionCode.PHONE_NUMBER_EXIST);
+        }
     }
 }
