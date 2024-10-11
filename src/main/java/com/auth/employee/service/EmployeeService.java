@@ -231,11 +231,16 @@ public class EmployeeService extends ExtractMemberEmail {
        return employeeRepository.findAllEmployeeIds();
     }
 
+
     //전화 번호 유효성 체크
     private void verifyExistPhoneNumber(String phoneNumber) {
         Optional<Employee> employee = employeeRepository.findByPhoneNumber(phoneNumber);
-        if(employee.isPresent()) {
+        if (employee.isPresent()) {
             throw new BusinessLogicException(ExceptionCode.PHONE_NUMBER_EXIST);
         }
+    }
+
+    public List<Long> getEmployeeIdsByDepartment(Long departmentId) {
+        return employeeRepository.findIdByDepartment(departmentId);
     }
 }

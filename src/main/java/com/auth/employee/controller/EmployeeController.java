@@ -229,5 +229,11 @@ public class EmployeeController {
         return new ResponseEntity<>(ids, HttpStatus.OK);
     }
 
+    @GetMapping("departments/{department-id}/employees")
+    public ResponseEntity getEmployeeIdsByDepartment (@PathVariable("department-id") Long departmentId,
+                                                      Authentication authentication) {
+        List<Long> ids = employeeService.getEmployeeIdsByDepartment(departmentId);
 
+        return new ResponseEntity<>(ids, HttpStatus.OK);
+    }
 }
