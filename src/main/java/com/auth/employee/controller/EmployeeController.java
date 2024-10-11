@@ -73,12 +73,12 @@ public class EmployeeController {
         );
     }
 
-    // 전체 회원 조회 - 관리자용
-    @GetMapping("/admin/employees")
+    // 전체 회원 조회는 직원, 관리자 나누지 않음.
+    // 전체 회원 조회 (주소록)
+    @GetMapping("/employees/all")
     public ResponseEntity getEmployeesForAdmin(@RequestParam @Positive int page,
                                        @RequestParam @Positive int size, Authentication authentication) {
 
-        employeeService.checkAdminAuthority(authentication);
         // Service에서 인증 및 권한 검증 수행
         Page<Employee> pageEmployees = employeeService.findEmployees(page - 1, size, authentication);
         List<Employee> employees = pageEmployees.getContent();
@@ -90,7 +90,7 @@ public class EmployeeController {
     }
 
 
-    // 특정 회원 조회 - 관리자용
+    // 특정 회원 조회 - 관리자용 (주소록)
     @GetMapping("/admin/employees/{id}")
     public ResponseEntity<SingleResponseDto<EmployeeDto.AdminResponse>> getEmployeeByIdForAdmin(@PathVariable Long id, Authentication authentication) {
 
@@ -102,7 +102,7 @@ public class EmployeeController {
         return ResponseEntity.ok(new SingleResponseDto<>(response));
     }
 
-    // 부서별 직원 조회 - 관리자용
+    // 부서별 직원 조회 - 관리자용 (주소록)
     @GetMapping("/admin/employees/departments/{departmentId}")
     public ResponseEntity<MultiResponseDto<EmployeeDto.AdminResponse>> getEmployeesByDepartmentForAdmin(
             @PathVariable Long departmentId,
@@ -120,23 +120,23 @@ public class EmployeeController {
         );
     }
 
-    // 전체 회원 조회 - 직원용
-    @GetMapping("/user/employees")
-    public ResponseEntity getEmployeesForUser(@RequestParam @Positive int page,
-                                       @RequestParam @Positive int size, Authentication authentication) {
+//    // 전체 회원 조회 - 직원용 (주소록)
+//    @GetMapping("/user/employees")
+//    public ResponseEntity getEmployeesForUser(@RequestParam @Positive int page,
+//                                       @RequestParam @Positive int size, Authentication authentication) {
+//
+//        // Service에서 인증 및 권한 검증 수행
+//        Page<Employee> pageEmployees = employeeService.findEmployees(page - 1, size, authentication);
+//        List<Employee> employees = pageEmployees.getContent();
+//
+//        return new ResponseEntity<>(
+//                new MultiResponseDto<>(employeeMapper.employeesToUserResponseDto(employees), pageEmployees),
+//                HttpStatus.OK
+//        );
+//    }
 
-        // Service에서 인증 및 권한 검증 수행
-        Page<Employee> pageEmployees = employeeService.findEmployees(page - 1, size, authentication);
-        List<Employee> employees = pageEmployees.getContent();
 
-        return new ResponseEntity<>(
-                new MultiResponseDto<>(employeeMapper.employeesToUserResponseDto(employees), pageEmployees),
-                HttpStatus.OK
-        );
-    }
-
-
-    // 특정 회원 조회 - 직원용
+    // 특정 회원 조회 - 직원용 (주소록)
     @GetMapping("/user/employees/{id}")
     public ResponseEntity<SingleResponseDto<EmployeeDto.UserResponse>> getEmployeeByIdForUser(@PathVariable Long id, Authentication authentication) {
 
@@ -147,7 +147,7 @@ public class EmployeeController {
         return ResponseEntity.ok(new SingleResponseDto<>(response));
     }
 
-    // 부서별 직원 조회 - 직원용
+    // 부서별 직원 조회 - 직원용 (주소록)
     @GetMapping("/user/employees/departments/{departmentId}")
     public ResponseEntity<MultiResponseDto<EmployeeDto.UserResponse>> getEmployeesByDepartmentForUser(
             @PathVariable Long departmentId,
