@@ -113,6 +113,7 @@ public class EmployeeDto {
         private String extensionNumber;
         private String emergencyNumber;
         private String departmentName;
+        private Long departmentId;
     }
 
     @Getter

@@ -15,5 +15,6 @@ public interface DepartmentMapper {
 
     Department toEntity(DepartmentDto.Post departmentPostDto);
     DepartmentDto.Post toDto(Department department);
+    DepartmentDto.Response departmentToDepartmentResponseDto(Department department);
     List<DepartmentDto.Response> departmentDtoList (List<Department> entity);
 }

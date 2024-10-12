@@ -2,11 +2,16 @@ package com.auth.department.controller;
 
 
 import com.auth.department.dto.DepartmentDto;
+import com.auth.department.entity.Department;
+import com.auth.department.mapper.DepartmentMapper;
 import com.auth.department.service.DepartmentService;
+import com.auth.dto.SingleResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 
@@ -15,6 +20,7 @@ import java.util.List;
 @RequestMapping("/departments")
 public class DepartmentController {
     private final DepartmentService departmentService;
+    private final DepartmentMapper mapper;
 
     @PostMapping
     public ResponseEntity<DepartmentDto.Post> createDepartment(@RequestBody DepartmentDto.Post departmentDto) {
@@ -25,5 +31,12 @@ public class DepartmentController {
     @GetMapping("/all")
     public List<DepartmentDto.Response> getDepartments() {
         return departmentService.findAll();
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity getDepartment(@PathVariable("id") @Positive long id) {
+        Department department = departmentService.findVerifiedDepartment(id);
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(mapper.departmentToDepartmentResponseDto(department)), HttpStatus.OK);
     }
 }

@@ -53,6 +53,7 @@ public interface EmployeeMapper {
         response.setExtensionNumber(employee.getExtensionNumber());
         response.setEmergencyNumber(employee.getEmergencyNumber());
         response.setDepartmentName(employee.getDepartment().getName()) ;
+        response.setDepartmentId(employee.getDepartment().getId());
 
         return response;
     }

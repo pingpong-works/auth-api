@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,5 +32,11 @@ public class DepartmentService {
 
     public List<DepartmentDto.Response> findAll() {
         return departmentMapper.departmentDtoList(departmentRepository.findAll());
+    }
+
+    public Department findVerifiedDepartment(long departmentId) {
+        Optional<Department> optionalDepartment = departmentRepository.findById(departmentId);
+        return optionalDepartment.orElseThrow(() ->
+                new BusinessLogicException(ExceptionCode.DEPARTMENT_NOT_FOUND));
     }
 }
