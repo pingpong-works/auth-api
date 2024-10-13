@@ -62,6 +62,10 @@ public class AuthService {
             Optional<Employee> optionalEmployee = employeeRepository.findByEmail(email);
             Employee employee = optionalEmployee.orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
 
+            // 출근 상태를 '퇴근'으로 변경
+            employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_OUT);
+            employeeRepository.save(employee); // 상태 변경 후 저장
+
             // Redis에 토큰 무효화 처리
             redisTemplate.opsForValue().set(token, "logout", 10, TimeUnit.MINUTES);
 
@@ -71,7 +75,9 @@ public class AuthService {
             return false;
         }
     }
+
     public boolean isTokenValid(String userName) {
         return redisTemplate.hasKey(userName);
     }
 }
+

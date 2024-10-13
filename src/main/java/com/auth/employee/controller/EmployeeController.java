@@ -54,24 +54,24 @@ public class EmployeeController {
     }
 
     //출퇴근 요청
-    @PostMapping("/employees/attendance")
-    public ResponseEntity toggleAttendance(Authentication authentication) {
-        String email = authentication.getPrincipal().toString();
-        Employee employee = employeeService.findVerifiedEmployee(email);
-
-        // 현재 출퇴근 상태에 따라 반대 상태로 토글
-        if (employee.getAttendanceStatus() == Employee.AttendanceStatus.CLOCKED_IN) {
-            employeeService.clockOut(employee);
-        } else {
-            employeeService.clockIn(employee);
-        }
-
-        // 업데이트된 상태 반환
-        return new ResponseEntity<>(
-                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(employee)),
-                HttpStatus.OK
-        );
-    }
+//    @PostMapping("/employees/attendance")
+//    public ResponseEntity toggleAttendance(Authentication authentication) {
+//        String email = authentication.getPrincipal().toString();
+//        Employee employee = employeeService.findVerifiedEmployee(email);
+//
+//        // 현재 출퇴근 상태에 따라 반대 상태로 토글
+//        if (employee.getAttendanceStatus() == Employee.AttendanceStatus.CLOCKED_IN) {
+//            employeeService.clockOut(employee);
+//        } else {
+//            employeeService.clockIn(employee);
+//        }
+//
+//        // 업데이트된 상태 반환
+//        return new ResponseEntity<>(
+//                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(employee)),
+//                HttpStatus.OK
+//        );
+//    }
 
     // 전체 회원 조회는 직원, 관리자 나누지 않음.
     // 전체 회원 조회 (주소록)
