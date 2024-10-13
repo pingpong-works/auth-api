@@ -63,17 +63,18 @@ public class EmployeeService extends ExtractMemberEmail {
         return employeeRepository.save(employee);
     }
 
-    // 출근 처리
-    public void clockIn(Employee employee) {
-        employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_IN);
-        employeeRepository.save(employee);
-    }
+//    // 출근 처리
+//    public void clockIn(Employee employee) {
+//        employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_IN);
+//        employeeRepository.save(employee);
+//    }
+//
+//    // 퇴근 처리
+//    public void clockOut(Employee employee) {
+//        employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_OUT);
+//        employeeRepository.save(employee);
+//    }
 
-    // 퇴근 처리
-    public void clockOut(Employee employee) {
-        employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_OUT);
-        employeeRepository.save(employee);
-    }
 
     // 직원 정보 조회 (Admin 권한만 가능)
     public Employee findEmployeeById(Long id, Authentication authentication) {

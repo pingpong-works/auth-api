@@ -76,7 +76,6 @@ public class RedisRepositoryConfig {
         // 이 설정은 Redis에 데이터를 저장할 때 직렬화 방식을 지정하는 것으로, 데이터 저장 형식을 정의합니다.
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
-
         return redisTemplate; // RedisTemplate 빈 반환
     }
 }
