@@ -11,34 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
-//@Service
-//@Transactional
-//public class AuthService {
-//    private final JwtTokenizer jwtTokenizer;
-//    private final RedisTemplate<String, Object> redisTemplate;
-//    private final EmployeeRepository employeeRepository;
-//
-//    public AuthService(JwtTokenizer jwtTokenizer, RedisTemplate<String, Object> redisTemplate, EmployeeRepository employeeRepository) {
-//        this.jwtTokenizer = jwtTokenizer;
-//        this.redisTemplate = redisTemplate;
-//        this.employeeRepository = employeeRepository;
-//    }
-//    public boolean logout(String username){
-//        //    레디스에서 username(이메일)을 기준으로 저장된 토큰을 삭제
-//        boolean tokenDeleted = jwtTokenizer.deleteRegisterToken(username);
-//
-//        Employee employee = employeeRepository.findByEmail(username)
-//                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
-//
-//        employee.setStatus(Employee.EmployeeStatus.LOGGED_OUT);
-//        employeeRepository.save(employee);
-//
-//        return tokenDeleted;
-//    }
-//}
 @Service
+@Transactional
 public class AuthService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final JwtTokenizer jwtTokenizer;
@@ -50,27 +25,47 @@ public class AuthService {
         this.employeeRepository = employeeRepository;
     }
 
-    public boolean logout(String token) {
+//    public boolean logout(String token) {
+//        try {
+//            // 토큰 검증
+//            jwtTokenizer.verifySignature(token, jwtTokenizer.getSecretKey());
+//
+//            // 토큰에서 이메일 추출
+//            String email = jwtTokenizer.getEmailFromToken(token);
+//
+//            // 이메일로 Employee 찾기
+//            Optional<Employee> optionalEmployee = employeeRepository.findByEmail(email);
+//            Employee employee = optionalEmployee.orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
+//
+//            // 출근 상태를 '퇴근'으로 변경
+//            employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_OUT);
+//            employeeRepository.save(employee); // 상태 변경 후 저장
+//
+//
+//            // Redis에 토큰 무효화 처리
+//            redisTemplate.opsForValue().set(token, "logout", 10, TimeUnit.MINUTES);
+//
+//            return true;
+//        } catch (JwtException | BusinessLogicException e) {
+//            // 예외 발생 시 로그아웃 실패 처리
+//            return false;
+//        }
+//    }
+
+    public boolean logout(String username) {
         try {
-            // 토큰 검증
-            jwtTokenizer.verifySignature(token, jwtTokenizer.getSecretKey());
-
-            // 토큰에서 이메일 추출
-            String email = jwtTokenizer.getEmailFromToken(token);
-
             // 이메일로 Employee 찾기
-            Optional<Employee> optionalEmployee = employeeRepository.findByEmail(email);
+            Optional<Employee> optionalEmployee = employeeRepository.findByEmail(username);
             Employee employee = optionalEmployee.orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
 
-            // 출근 상태를 '퇴근'으로 변경
-            employee.setAttendanceStatus(Employee.AttendanceStatus.CLOCKED_OUT);
+            // 상태를 LOGGED_OUT으로 변경
+            employee.setStatus(Employee.EmployeeStatus.LOGGED_OUT);
             employeeRepository.save(employee); // 상태 변경 후 저장
 
-            // Redis에 토큰 무효화 처리
-            redisTemplate.opsForValue().set(token, "logout", 10, TimeUnit.MINUTES);
+            // Redis에서 토큰 삭제 로직 실행
+            return jwtTokenizer.deleteRegisterToken(username);
 
-            return true;
-        } catch (JwtException | BusinessLogicException e) {
+        } catch (BusinessLogicException e) {
             // 예외 발생 시 로그아웃 실패 처리
             return false;
         }
