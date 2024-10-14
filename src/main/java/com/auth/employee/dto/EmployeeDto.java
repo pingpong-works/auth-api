@@ -47,7 +47,6 @@ public class EmployeeDto {
 
         private String profilePicture;
 
-        @NotNull
         private Long departmentId;
 
         @NotNull
