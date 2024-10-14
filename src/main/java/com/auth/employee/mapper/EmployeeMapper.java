@@ -24,7 +24,6 @@ public interface EmployeeMapper {
         response.setProfilePicture(employee.getProfilePicture());
         response.setCreatedAt(employee.getCreatedAt().toString());  // createdAt을 String으로 변환
         response.setStatus(employee.getStatus());
-        response.setAttendanceStatus(employee.getAttendanceStatus());
         response.setEmployeeRank(employee.getEmployeeRank().toString());
         // 추가된 필드 설정
         response.setExtensionNumber(employee.getExtensionNumber());
@@ -54,6 +53,7 @@ public interface EmployeeMapper {
         response.setEmergencyNumber(employee.getEmergencyNumber());
         response.setDepartmentName(employee.getDepartment().getName()) ;
         response.setDepartmentId(employee.getDepartment().getId());
+        response.setStatus(employee.getStatus().toString());
 
         return response;
     }
@@ -138,7 +138,6 @@ public interface EmployeeMapper {
         response.setCreatedAt(employee.getCreatedAt().toString());
         response.setEmployeeRank(employee.getEmployeeRank().getRankName());
         response.setStatus(employee.getStatus().getStatus());
-        response.setAttendanceStatus(employee.getAttendanceStatus().getStatus());
 
         return response;
     }
