@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 @Setter
 public class EmployeeDto {
 
-    // Post DTO (Employee 생성용)
+    // 직원 생성용 Post DTO
     @Getter
     @Setter
     @NoArgsConstructor
@@ -44,20 +44,19 @@ public class EmployeeDto {
         private String phoneNumber;
 
         private String extensionNumber;
-
         private String profilePicture;
-
         private Long departmentId;
 
         @NotNull
         private Employee.EmployeeRank employeeRank; // 직급 필드 추가
     }
 
+    // 관리자 생성용 Post DTO
     @Getter
     @Setter
     @NoArgsConstructor
     @PasswordMatches
-    public static class AdminPost { // 직원
+    public static class AdminPost { // 관리자
 
         @NotNull
         @Pattern(regexp = "^[가-힣]+$", message = "이름은 한글만 입력 가능합니다.")
@@ -78,7 +77,7 @@ public class EmployeeDto {
 
     }
 
-    // Patch DTO (Employee 수정용)
+    // 직원 수정용 Patch DTO
     @Getter
     @Setter
     @NoArgsConstructor
@@ -102,7 +101,7 @@ public class EmployeeDto {
         private Employee.EmployeeRank employeeRank;
     }
 
-    // Response DTO (Admin 응답용)
+    // 관리자 응답용 DTO
     @Getter
     @Setter
     @NoArgsConstructor
@@ -110,19 +109,9 @@ public class EmployeeDto {
         private long employeeId;
         private String name;
         private String email;
-        private String phoneNumber;
-        private String profilePicture;
-        private String extensionNumber;
-        private String emergencyNumber;
-        private String address;
-        private String vehicleNumber;
-        private String createdAt;
-        private Employee.EmployeeStatus status;
-        private String departmentName;
-        private String employeeRank;
     }
 
-    // Response DTO (Employee 응답용)
+    // 직원 응답용 DTO
     @Getter
     @Setter
     @NoArgsConstructor
@@ -140,6 +129,7 @@ public class EmployeeDto {
         private String status;
     }
 
+    // 비밀번호 변경용 DTO
     @Getter
     @Setter
     public static class UpdatePassword {
@@ -156,6 +146,7 @@ public class EmployeeDto {
         private String confirmNewPassword;
     }
 
+    // 직원 정보 조회용 InfoResponse DTO
     @Getter
     @Setter
     @NoArgsConstructor
