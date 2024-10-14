@@ -56,7 +56,7 @@ public class EmployeeService extends ExtractMemberEmail {
         employee.getPermissions().add("ROLE_USER");
 
         // 관리자 계정일 경우 ROLE_ADMIN 권한 추가
-        if ("admin@example.com".equals(employee.getEmail())) {
+        if ("admin@pingpong-works.com".equals(employee.getEmail())) {
             employee.getPermissions().add("ROLE_ADMIN");
         }
 
@@ -80,7 +80,7 @@ public class EmployeeService extends ExtractMemberEmail {
         employee.getPermissions().add("ROLE_USER");
 
         // 관리자 계정일 경우 ROLE_ADMIN 권한 추가
-        if ("admin@example.com".equals(employee.getEmail())) {
+        if ("admin@pingpong-works.com".equals(employee.getEmail())) {
             employee.getPermissions().add("ROLE_ADMIN");
         }
 
@@ -119,7 +119,7 @@ public class EmployeeService extends ExtractMemberEmail {
 
         // 관리자 이메일인 admin@example.com을 제외하고, 상태가 EMPLOYEE_QUIT가 아닌 직원들만 필터링
         List<Employee> filteredEmployees = allEmployees.stream()
-                .filter(employee -> !"admin@example.com".equals(employee.getEmail())) // 관리자 이메일 제외
+                .filter(employee -> !"admin@pingpong-works.com".equals(employee.getEmail())) // 관리자 이메일 제외
                 .filter(employee -> employee.getStatus() != Employee.EmployeeStatus.EMPLOYEE_QUIT) // EMPLOYEE_QUIT 상태 제외
                 .collect(Collectors.toList());
 
@@ -146,7 +146,7 @@ public class EmployeeService extends ExtractMemberEmail {
 
         // 관리자를 제외하고 필터링
         List<Employee> filteredEmployees = allEmployees.stream()
-                .filter(employee -> !"admin@example.com".equals(employee.getEmail())) // 관리자 이메일 제외
+                .filter(employee -> !"admin@pingpong-works.com".equals(employee.getEmail())) // 관리자 이메일 제외
                 .collect(Collectors.toList());
 
         // 필터링된 직원 리스트로 다시 Page 객체 생성
@@ -273,7 +273,7 @@ public class EmployeeService extends ExtractMemberEmail {
 
     // 관리자 권한 체크 (이메일로 확인)
     public void checkAdminAuthority(Authentication authentication) {
-        if (authentication == null || !authentication.getPrincipal().equals("admin@example.com")) {
+        if (authentication == null || !authentication.getPrincipal().equals("admin@pingpong-works.com")) {
             throw new BusinessLogicException(ExceptionCode.ACCESS_DENIED);
         }
     }

@@ -84,7 +84,7 @@ public class EmployeeController {
         List<Employee> employees = pageEmployees.getContent();
 
         return new ResponseEntity<>(
-                new MultiResponseDto<>(employeeMapper.employeesToAdminResponseDto(employees), pageEmployees),
+                new MultiResponseDto<>(employeeMapper.employeesToEmployeeInfoResponseDto(employees), pageEmployees),
                 HttpStatus.OK
         );
     }
@@ -92,12 +92,12 @@ public class EmployeeController {
 
     // 특정 회원 조회 - 관리자, 직원 (주소록)
     @GetMapping("/employees/{id}")
-    public ResponseEntity<SingleResponseDto<EmployeeDto.AdminResponse>> getEmployeeByIdForAdmin(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<SingleResponseDto<EmployeeDto.InfoResponse>> getEmployeeByIdForAdmin(@PathVariable Long id, Authentication authentication) {
 
 //        employeeService.checkAdminAuthority(authentication);
         // Service에서 인증 및 권한 검증 수행
         Employee employee = employeeService.findEmployeeById(id, authentication);
-        EmployeeDto.AdminResponse response = employeeMapper.employeeToAdminResponseDto(employee);
+        EmployeeDto.InfoResponse response = employeeMapper.employeeToEmployeeInfoResponse(employee);
 
         return ResponseEntity.ok(new SingleResponseDto<>(response));
     }
@@ -112,7 +112,7 @@ public class EmployeeController {
 //        employeeService.checkAdminAuthority(authentication);
         // Service에서 인증 및 권한 검증 수행
         Page<Employee> pageEmployees = employeeService.findEmployeesByDepartment(departmentId, page - 1, size, authentication);
-        List<EmployeeDto.AdminResponse> responseDtos = employeeMapper.employeesToAdminResponseDto(pageEmployees.getContent());
+        List<EmployeeDto.AdminResponse> responseDtos = employeeMapper.employeesToAdminInfoResponseDto(pageEmployees.getContent());
 
         return new ResponseEntity<>(
                 new MultiResponseDto<>(responseDtos, pageEmployees),
@@ -134,14 +134,14 @@ public class EmployeeController {
 
     // 부서별 직원 조회 - 직원용 (주소록) -> 대시보드 부서 활동에서 사용
     @GetMapping("/user/employees/departments/{departmentId}")
-    public ResponseEntity<MultiResponseDto<EmployeeDto.UserResponse>> getEmployeesByDepartmentForUser(
+    public ResponseEntity<MultiResponseDto<EmployeeDto.InfoResponse>> getEmployeesByDepartmentForUser(
             @PathVariable Long departmentId,
             @RequestParam @Positive int page,
             @RequestParam @Positive int size, Authentication authentication) {
 
         // Service에서 인증 및 권한 검증 수행
         Page<Employee> pageEmployees = employeeService.findEmployeesByDepartment(departmentId, page - 1, size, authentication);
-        List<EmployeeDto.UserResponse> responseDtos = employeeMapper.employeesToUserResponseDto(pageEmployees.getContent());
+        List<EmployeeDto.InfoResponse> responseDtos = employeeMapper.employeesToEmployeeInfoResponseDto(pageEmployees.getContent());
 
         return new ResponseEntity<>(
                 new MultiResponseDto<>(responseDtos, pageEmployees),
@@ -179,16 +179,34 @@ public class EmployeeController {
         );
     }
 
-    //내 정보 조회
+    //내 정보 조회 - 직원용
     @GetMapping("/employees/my-info")
     public ResponseEntity getMyInfo(@AuthenticationPrincipal Object principal) {
-        Employee employee = employeeService.findVerifiedEmployee(principal.toString());
-        EmployeeDto.InfoResponse infoResponse = employeeMapper.employeeToEmployeeInfoResponse(employee);
-        infoResponse.setDepartmentName(employee.getDepartment().getName());
+        // principal 객체에서 사용자 정보를 추출
+        String email = principal.toString(); // principal에서 email을 가져오는 방식이 필요함
 
-        return new ResponseEntity(
-                new SingleResponseDto<>(infoResponse), HttpStatus.OK);
+        // 직원 정보 조회
+        Employee employee = employeeService.findVerifiedEmployee(email);
+
+        // 직급에 따라 응답 분기
+        if (employee.getEmail().equals("admin@pingpong-works.com")) {  // 관리자인 경우
+            // 관리자용 응답
+            EmployeeDto.AdminResponse adminInfoResponse = employeeMapper.employeeToAdminInfoResponse(employee);
+
+            return new ResponseEntity(
+                    new SingleResponseDto<>(adminInfoResponse), HttpStatus.OK);
+        } else {
+            // 직원용 응답
+            EmployeeDto.InfoResponse employeeInfoResponse = employeeMapper.employeeToEmployeeInfoResponse(employee);
+            employeeInfoResponse.setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getName() : null);
+
+            return new ResponseEntity(
+                    new SingleResponseDto<>(employeeInfoResponse), HttpStatus.OK);
+        }
     }
+
+
+
 
     //비밀번호 변경
     @PatchMapping("/employees/password")
