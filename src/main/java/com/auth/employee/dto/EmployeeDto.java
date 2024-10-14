@@ -20,7 +20,7 @@ public class EmployeeDto {
     @Setter
     @NoArgsConstructor
     @PasswordMatches
-    public static class Post {
+    public static class EmployeePost { // 직원
 
         @NotNull
         @Pattern(regexp = "^[가-힣]+$", message = "이름은 한글만 입력 가능합니다.")
@@ -51,6 +51,31 @@ public class EmployeeDto {
 
         @NotNull
         private Employee.EmployeeRank employeeRank; // 직급 필드 추가
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @PasswordMatches
+    public static class AdminPost { // 직원
+
+        @NotNull
+        @Pattern(regexp = "^[가-힣]+$", message = "이름은 한글만 입력 가능합니다.")
+        private String name;
+
+        @NotNull
+        @Email
+        private String email;
+
+        @NotNull(message = "비밀번호는 필수 항목입니다.")
+        @Size(min = 8, max = 15, message = "비밀번호는 8자에서 15자 사이여야 합니다.")
+        @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?`~]{8,15}$",
+                message = "비밀번호는 8자이상 15자 이하의 알파벳, 숫자, 특수문자만 포함할 수 있습니다.")
+        private String password;
+
+        @NotNull(message = "비밀번호를 한번더 입력해주세요.")
+        private String confirmPassword;
+
     }
 
     // Patch DTO (Employee 수정용)

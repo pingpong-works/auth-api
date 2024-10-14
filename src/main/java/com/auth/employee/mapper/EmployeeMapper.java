@@ -81,7 +81,7 @@ public interface EmployeeMapper {
     }
 
 
-    default Employee employeePostToEmployee(EmployeeDto.Post postDto) {
+    default Employee employeePostToEmployee(EmployeeDto.EmployeePost postDto) {
         if (postDto == null) {
             return null;
         }
@@ -94,6 +94,18 @@ public interface EmployeeMapper {
         employee.setStatus(Employee.EmployeeStatus.EMPLOYEE_ACTIVE);
         employee.setEmployeeRank(postDto.getEmployeeRank());
         employee.setExtensionNumber(postDto.getExtensionNumber());
+
+        return employee;
+    }
+
+    default Employee adminPostToAdmin(EmployeeDto.AdminPost postDto) {
+        if (postDto == null) {
+            return null;
+        }
+        Employee employee = new Employee();
+        employee.setName(postDto.getName());
+        employee.setEmail(postDto.getEmail());
+        employee.setPassword(postDto.getPassword());
 
         return employee;
     }

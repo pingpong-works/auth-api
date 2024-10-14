@@ -28,10 +28,6 @@ public class Department extends Auditable {
     @Column(name = "department_name", nullable = false, length = Integer.MAX_VALUE, unique = true)
     private String name;
 
-    @NotNull
-    @Column(name = "description", nullable = false, length = Integer.MAX_VALUE)
-    private String description;
-
     @OneToMany(mappedBy = "department")
     @JsonManagedReference // 순환 참조 방지
     private List<Employee> employees;
