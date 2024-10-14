@@ -63,10 +63,6 @@ public class Employee extends Auditable {
     @Column(name = "employee_status", length = 20, nullable = false)
     private EmployeeStatus status = EmployeeStatus.EMPLOYEE_ACTIVE;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(name = "attendance_status", length = 20, nullable = false)
-    private AttendanceStatus attendanceStatus = AttendanceStatus.CLOCKED_OUT;
-
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> permissions = new ArrayList<>();
 
@@ -106,15 +102,4 @@ public class Employee extends Auditable {
         }
     }
 
-    public enum AttendanceStatus {
-        CLOCKED_IN("출근"),
-        CLOCKED_OUT("퇴근");
-
-        @Getter
-        private String status;
-
-        AttendanceStatus(String status) {
-            this.status = status;
-        }
-    }
 }

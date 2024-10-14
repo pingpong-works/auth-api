@@ -92,14 +92,16 @@ public class EmployeeService extends ExtractMemberEmail {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("employeeId").ascending());
         Page<Employee> allEmployees = employeeRepository.findAll(pageRequest);
 
-        // 관리자 이메일인 admin@example.com을 제외하고 필터링
+        // 관리자 이메일인 admin@example.com을 제외하고, 상태가 EMPLOYEE_QUIT가 아닌 직원들만 필터링
         List<Employee> filteredEmployees = allEmployees.stream()
                 .filter(employee -> !"admin@example.com".equals(employee.getEmail())) // 관리자 이메일 제외
+                .filter(employee -> employee.getStatus() != Employee.EmployeeStatus.EMPLOYEE_QUIT) // EMPLOYEE_QUIT 상태 제외
                 .collect(Collectors.toList());
 
         // 필터링된 직원 리스트로 다시 Page 객체 생성
         return new PageImpl<>(filteredEmployees, pageRequest, filteredEmployees.size());
     }
+
 
 
     // 부서별 직원 조회 로직 -관리자 및 직원 나누기.
@@ -167,6 +169,17 @@ public class EmployeeService extends ExtractMemberEmail {
         return employeeRepository.save(authenticatedEmployee);
     }
 
+    // 로그 아웃 -> 오프라인 상태 변경
+    @Transactional
+    public void updateStatus(String email) {
+        Employee employee = employeeRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
+
+        // 상태 변경
+        employee.setStatus(Employee.EmployeeStatus.LOGGED_OUT);
+
+        employeeRepository.save(employee);  // 상태 변경 후 저장
+    }
 
     //비밀번호 변경
     public Employee updatePassword(String email, EmployeeDto.UpdatePassword updatePasswordDto) {

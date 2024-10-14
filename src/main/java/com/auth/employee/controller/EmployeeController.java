@@ -53,26 +53,6 @@ public class EmployeeController {
         return ResponseEntity.created(location).build();
     }
 
-    //출퇴근 요청
-//    @PostMapping("/employees/attendance")
-//    public ResponseEntity toggleAttendance(Authentication authentication) {
-//        String email = authentication.getPrincipal().toString();
-//        Employee employee = employeeService.findVerifiedEmployee(email);
-//
-//        // 현재 출퇴근 상태에 따라 반대 상태로 토글
-//        if (employee.getAttendanceStatus() == Employee.AttendanceStatus.CLOCKED_IN) {
-//            employeeService.clockOut(employee);
-//        } else {
-//            employeeService.clockIn(employee);
-//        }
-//
-//        // 업데이트된 상태 반환
-//        return new ResponseEntity<>(
-//                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(employee)),
-//                HttpStatus.OK
-//        );
-//    }
-
     // 전체 회원 조회는 직원, 관리자 나누지 않음.
     // 전체 회원 조회 (주소록)
     @GetMapping("/employees/all")
@@ -90,11 +70,11 @@ public class EmployeeController {
     }
 
 
-    // 특정 회원 조회 - 관리자용 (주소록)
-    @GetMapping("/admin/employees/{id}")
+    // 특정 회원 조회 - 관리자, 직원 (주소록)
+    @GetMapping("/employees/{id}")
     public ResponseEntity<SingleResponseDto<EmployeeDto.AdminResponse>> getEmployeeByIdForAdmin(@PathVariable Long id, Authentication authentication) {
 
-        employeeService.checkAdminAuthority(authentication);
+//        employeeService.checkAdminAuthority(authentication);
         // Service에서 인증 및 권한 검증 수행
         Employee employee = employeeService.findEmployeeById(id, authentication);
         EmployeeDto.AdminResponse response = employeeMapper.employeeToAdminResponseDto(employee);
@@ -109,7 +89,7 @@ public class EmployeeController {
             @RequestParam @Positive int page,
             @RequestParam @Positive int size, Authentication authentication) {
 
-        employeeService.checkAdminAuthority(authentication);
+//        employeeService.checkAdminAuthority(authentication);
         // Service에서 인증 및 권한 검증 수행
         Page<Employee> pageEmployees = employeeService.findEmployeesByDepartment(departmentId, page - 1, size, authentication);
         List<EmployeeDto.AdminResponse> responseDtos = employeeMapper.employeesToAdminResponseDto(pageEmployees.getContent());
@@ -119,21 +99,6 @@ public class EmployeeController {
                 HttpStatus.OK
         );
     }
-
-//    // 전체 회원 조회 - 직원용 (주소록)
-//    @GetMapping("/user/employees")
-//    public ResponseEntity getEmployeesForUser(@RequestParam @Positive int page,
-//                                       @RequestParam @Positive int size, Authentication authentication) {
-//
-//        // Service에서 인증 및 권한 검증 수행
-//        Page<Employee> pageEmployees = employeeService.findEmployees(page - 1, size, authentication);
-//        List<Employee> employees = pageEmployees.getContent();
-//
-//        return new ResponseEntity<>(
-//                new MultiResponseDto<>(employeeMapper.employeesToUserResponseDto(employees), pageEmployees),
-//                HttpStatus.OK
-//        );
-//    }
 
 
     // 특정 회원 조회 - 직원용 (주소록)
@@ -164,6 +129,16 @@ public class EmployeeController {
         );
     }
 
+    // 로그아웃 -> LOGGED_OUT 상태 변경
+    @PatchMapping("/employees/update-status")
+    public ResponseEntity updateEmployeeStatus(Authentication authentication) {
+        String email = (String) authentication.getPrincipal();
+
+        // 서비스에서 상태 업데이트 수행
+        employeeService.updateStatus(email);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     // 내 정보 수정
     @PatchMapping("/employees")

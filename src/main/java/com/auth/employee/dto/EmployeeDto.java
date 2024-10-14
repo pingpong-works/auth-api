@@ -94,7 +94,6 @@ public class EmployeeDto {
         private String vehicleNumber;
         private String createdAt;
         private Employee.EmployeeStatus status;
-        private Employee.AttendanceStatus attendanceStatus;
         private String departmentName;
         private String employeeRank;
     }
@@ -114,6 +113,7 @@ public class EmployeeDto {
         private String emergencyNumber;
         private String departmentName;
         private Long departmentId;
+        private String status;
     }
 
     @Getter
@@ -150,6 +150,5 @@ public class EmployeeDto {
         private String createdAt;
         private String employeeRank;
         private String status;
-        private String attendanceStatus;
     }
 }
