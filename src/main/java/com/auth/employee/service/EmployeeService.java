@@ -110,12 +110,24 @@ public class EmployeeService extends ExtractMemberEmail {
         Department department = departmentRepository.findById(departmentId)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DEPARTMENT_NOT_FOUND));
 
-        return employeeRepository.findByDepartment_IdAndStatusNot(
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("employeeId").descending());
+
+        // 부서에 속한 직원들 중 상태가 EMPLOYEE_QUIT가 아니고 관리자(admin@example.com)가 아닌 직원 필터링
+        Page<Employee> allEmployees = employeeRepository.findByDepartment_IdAndStatusNot(
                 departmentId,
                 Employee.EmployeeStatus.EMPLOYEE_QUIT,  // EMPLOYEE_QUIT 상태를 제외
-                PageRequest.of(page, size, Sort.by("employeeId").descending())
+                pageRequest
         );
+
+        // 관리자를 제외하고 필터링
+        List<Employee> filteredEmployees = allEmployees.stream()
+                .filter(employee -> !"admin@example.com".equals(employee.getEmail())) // 관리자 이메일 제외
+                .collect(Collectors.toList());
+
+        // 필터링된 직원 리스트로 다시 Page 객체 생성
+        return new PageImpl<>(filteredEmployees, pageRequest, filteredEmployees.size());
     }
+
 
     // 직원 정보 수정 (Patch)
     public Employee updateEmployee(Employee employee, Authentication authentication) {

@@ -130,6 +130,7 @@ public interface EmployeeMapper {
         response.setEmail(employee.getEmail());
         response.setProfilePicture(employee.getProfilePicture());
         response.setDepartmentName(employee.getDepartment().toString());
+        response.setDepartmentId(employee.getDepartment().getId());
         response.setPhoneNumber(employee.getPhoneNumber());
         response.setExtensionNumber(employee.getExtensionNumber());
         response.setEmergencyNumber(employee.getEmergencyNumber());
