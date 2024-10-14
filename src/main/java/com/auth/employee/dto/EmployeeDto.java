@@ -142,6 +142,7 @@ public class EmployeeDto {
         private String email;
         private String profilePicture;
         private String departmentName;
+        private Long departmentId;
         private String phoneNumber;
         private String extensionNumber;
         private String emergencyNumber;

@@ -112,7 +112,7 @@ public class EmployeeController {
         return ResponseEntity.ok(new SingleResponseDto<>(response));
     }
 
-    // 부서별 직원 조회 - 직원용 (주소록)
+    // 부서별 직원 조회 - 직원용 (주소록) -> 대시보드 부서 활동에서 사용
     @GetMapping("/user/employees/departments/{departmentId}")
     public ResponseEntity<MultiResponseDto<EmployeeDto.UserResponse>> getEmployeesByDepartmentForUser(
             @PathVariable Long departmentId,
@@ -172,7 +172,7 @@ public class EmployeeController {
 
     //비밀번호 변경
     @PatchMapping("/employees/password")
-    @CrossOrigin(origins = "http://localhost:3000")
+    @CrossOrigin(origins = "http://localhost:5173")
     public ResponseEntity updatePassword(Authentication authentication,
                                          @Valid @RequestBody EmployeeDto.UpdatePassword updatePasswordDto,
                                          BindingResult bindingResult) {
@@ -204,7 +204,7 @@ public class EmployeeController {
         return new ResponseEntity<>(ids, HttpStatus.OK);
     }
 
-    @GetMapping("departments/{department-id}/employees")
+    @GetMapping("/departments/{department-id}/employees")
     public ResponseEntity getEmployeeIdsByDepartment (@PathVariable("department-id") Long departmentId,
                                                       Authentication authentication) {
         List<Long> ids = employeeService.getEmployeeIdsByDepartment(departmentId);
