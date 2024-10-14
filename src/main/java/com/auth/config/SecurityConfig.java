@@ -113,7 +113,7 @@ public class SecurityConfig {
             AuthenticationManager authenticationManager =
                     builder.getSharedObject(AuthenticationManager.class);
             JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer, employeeRepository, passwordEncoder());
-            jwtAuthenticationFilter.setFilterProcessesUrl("/login");
+            jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new EmployeeAuthenticationSuccessHandler(employeeRepository));
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new EmployeeAuthenticationFailureHandler());
             JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, jwtAuthorityUtils, redisTemplate);

@@ -36,11 +36,10 @@ public class Employee extends Auditable {
     @Column(name = "password", length = 255, nullable = false)
     private String password;
 
-    @NotNull
     @Column(name ="phone_number", unique = true)
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String extensionNumber;
 
     @Column(nullable = true)
@@ -56,11 +55,11 @@ public class Employee extends Auditable {
     private String profilePicture;
 
     @Enumerated(value = EnumType.STRING)
-    @Column(name = "employee_rank", length = 20, nullable = false)
+    @Column(name = "employee_rank", length = 20)
     private EmployeeRank employeeRank;  // 직급 필드 추가
 
     @Enumerated(value = EnumType.STRING)
-    @Column(name = "employee_status", length = 20, nullable = false)
+    @Column(name = "employee_status", length = 20)
     private EmployeeStatus status = EmployeeStatus.EMPLOYEE_ACTIVE;
 
     @ElementCollection(fetch = FetchType.EAGER)

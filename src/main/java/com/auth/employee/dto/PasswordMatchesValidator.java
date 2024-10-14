@@ -7,8 +7,8 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
 
     @Override
     public boolean isValid(Object obj, ConstraintValidatorContext context) {
-        if (obj instanceof EmployeeDto.Post) {
-            EmployeeDto.Post dto = (EmployeeDto.Post) obj;
+        if (obj instanceof EmployeeDto.EmployeePost) {
+            EmployeeDto.EmployeePost dto = (EmployeeDto.EmployeePost) obj;
             return dto.getPassword() != null && dto.getPassword().equals(dto.getConfirmPassword());
         }
         return false;

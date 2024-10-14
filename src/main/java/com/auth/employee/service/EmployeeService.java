@@ -36,7 +36,7 @@ public class EmployeeService extends ExtractMemberEmail {
 
 
     // 직원 생성
-    public Employee createEmployee(EmployeeDto.Post employeePostDto) {
+    public Employee createEmployee(EmployeeDto.EmployeePost employeePostDto) {
         Department department = departmentRepository.findById(employeePostDto.getDepartmentId())
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DEPARTMENT_NOT_FOUND));
 
@@ -62,6 +62,31 @@ public class EmployeeService extends ExtractMemberEmail {
 
         return employeeRepository.save(employee);
     }
+
+    // 관리자 생성
+    public Employee createAdmin(EmployeeDto.AdminPost employeePostDto) {
+
+        //직원이 이미 있는 지 검증
+        verifyExistEmployee(employeePostDto.getEmail());
+
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(employeePostDto.getPassword());
+        employeePostDto.setPassword(encodedPassword);
+
+        // Employee 객체 생성
+        Employee employee = employeeMapper.adminPostToAdmin(employeePostDto);
+
+        // 기본 권한 설정 (모든 직원에게 ROLE_USER 부여)
+        employee.getPermissions().add("ROLE_USER");
+
+        // 관리자 계정일 경우 ROLE_ADMIN 권한 추가
+        if ("admin@example.com".equals(employee.getEmail())) {
+            employee.getPermissions().add("ROLE_ADMIN");
+        }
+
+        return employeeRepository.save(employee);
+    }
+
 
 //    // 출근 처리
 //    public void clockIn(Employee employee) {

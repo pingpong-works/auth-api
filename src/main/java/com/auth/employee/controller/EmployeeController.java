@@ -23,7 +23,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
+
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,9 +36,9 @@ public class EmployeeController {
     private final AuthService authService;
     private final EmployeeRepository employeeRepository;
 
-    // 회원가입 완료
+    // 직원
     @PostMapping("/employees")
-    public ResponseEntity createEmployee(@Valid @RequestBody EmployeeDto.Post employeeDto, BindingResult bindingResult) {
+    public ResponseEntity createEmployee(@Valid @RequestBody EmployeeDto.EmployeePost employeeDto, BindingResult bindingResult) {
         // 유효성 검사 후 에러가 있으면 처리
         if (bindingResult.hasErrors()) {
             // 유효성 검사에서 발생한 오류 메시지들을 반환
@@ -49,6 +49,26 @@ public class EmployeeController {
         }
         Employee employee = employeeMapper.employeePostToEmployee(employeeDto);
         employeeService.createEmployee(employeeDto);
+        URI location = UriCreator.createUri(EMPLOYEE_DEFAULT_URL, employee.getEmployeeId());
+        return ResponseEntity.created(location).build();
+    }
+
+    // 관리자 생성
+    @PostMapping("/signup")
+    public ResponseEntity createAdmin(@RequestBody EmployeeDto.AdminPost employeeDto, BindingResult bindingResult) {
+        // 유효성 검사 후 에러가 있으면 처리
+        if (bindingResult.hasErrors()) {
+            bindingResult.getFieldErrors().forEach(error -> {
+                System.out.println("Field: " + error.getField() + " - Message: " + error.getDefaultMessage());
+            });
+            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+                    .map(fieldError -> fieldError.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(errorMessages);
+        }
+
+        Employee employee = employeeMapper.adminPostToAdmin(employeeDto);
+        employeeService.createAdmin(employeeDto);
         URI location = UriCreator.createUri(EMPLOYEE_DEFAULT_URL, employee.getEmployeeId());
         return ResponseEntity.created(location).build();
     }
