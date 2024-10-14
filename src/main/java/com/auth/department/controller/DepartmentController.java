@@ -9,6 +9,7 @@ import com.auth.dto.SingleResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Positive;
@@ -23,8 +24,10 @@ public class DepartmentController {
     private final DepartmentMapper mapper;
 
     @PostMapping
-    public ResponseEntity<DepartmentDto.Post> createDepartment(@RequestBody DepartmentDto.Post departmentDto) {
-        DepartmentDto.Post createdDepartment = departmentService.createDepartment(departmentDto);
+    public ResponseEntity<DepartmentDto.Post> createDepartment(Authentication authentication,
+                                                               @RequestBody DepartmentDto.Post departmentDto) {
+
+        DepartmentDto.Post createdDepartment = departmentService.createDepartment(departmentDto, authentication);
         return new ResponseEntity<>(createdDepartment, HttpStatus.CREATED);
     }
 

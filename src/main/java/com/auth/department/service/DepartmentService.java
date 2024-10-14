@@ -5,9 +5,11 @@ import com.auth.department.dto.DepartmentDto;
 import com.auth.department.entity.Department;
 import com.auth.department.mapper.DepartmentMapper;
 import com.auth.department.repository.DepartmentRepository;
+import com.auth.employee.service.EmployeeService;
 import com.auth.exception.BusinessLogicException;
 import com.auth.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,9 +20,13 @@ import java.util.Optional;
 public class DepartmentService {
     public final DepartmentRepository departmentRepository;
     public final DepartmentMapper departmentMapper;
+    public final EmployeeService employeeService;
 
+    public DepartmentDto.Post createDepartment(DepartmentDto.Post departmentPostDto, Authentication authentication) {
 
-    public DepartmentDto.Post createDepartment(DepartmentDto.Post departmentPostDto) {
+        //관리자 인지 체크
+        employeeService.checkAdminAuthority(authentication);
+
         if (departmentRepository.existsByName(departmentPostDto.getName())) {
             throw new BusinessLogicException(ExceptionCode.DEPARTMENT_EXIST);
         }
