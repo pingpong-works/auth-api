@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class EmployeeController {
     private final static String EMPLOYEE_DEFAULT_URL = "/employees";
@@ -37,7 +37,7 @@ public class EmployeeController {
     private final EmployeeRepository employeeRepository;
 
     // 회원가입 완료
-    @PostMapping("/signup")
+    @PostMapping("/employees")
     public ResponseEntity createEmployee(@Valid @RequestBody EmployeeDto.Post employeeDto, BindingResult bindingResult) {
         // 유효성 검사 후 에러가 있으면 처리
         if (bindingResult.hasErrors()) {
