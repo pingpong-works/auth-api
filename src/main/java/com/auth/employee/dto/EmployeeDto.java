@@ -91,7 +91,6 @@ public class EmployeeDto {
 
         @Pattern(regexp = "^(010-\\d{4}-\\d{4}|010\\d{8})$", message = "휴대폰 번호는 '010-XXXX-XXXX' 또는 '010XXXXXXXX' 형식이어야 합니다.")
         private String phoneNumber;
-
         private String extensionNumber;
         private String emergencyNumber;
         private String address;

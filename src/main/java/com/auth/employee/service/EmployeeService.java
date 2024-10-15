@@ -240,10 +240,10 @@ public class EmployeeService extends ExtractMemberEmail {
         Optional.ofNullable(employee.getVehicleNumber())
                 .filter(vehicleNumber -> !vehicleNumber.equals(authenticatedEmployee.getVehicleNumber()))
                 .ifPresent(authenticatedEmployee::setVehicleNumber);
-        // 직급 업데이트
-        Optional.ofNullable(employee.getEmployeeRank())
-                .filter(employeeRank -> !employeeRank.equals(authenticatedEmployee.getEmployeeRank()))
-                .ifPresent(authenticatedEmployee::setEmployeeRank);
+//        // 직급 업데이트
+//        Optional.ofNullable(employee.getEmployeeRank())
+//                .filter(employeeRank -> !employeeRank.equals(authenticatedEmployee.getEmployeeRank()))
+//                .ifPresent(authenticatedEmployee::setEmployeeRank);
 
         return employeeRepository.save(authenticatedEmployee);
     }

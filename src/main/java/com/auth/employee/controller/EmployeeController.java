@@ -207,7 +207,6 @@ public class EmployeeController {
 
         // Service에서 인증 및 권한 검증 수행 후 정보 수정
         Employee employee = employeeMapper.employeePatchToEmployee(patch);
-        employee.setDepartment(departmentRepository.findById(patch.getDepartmentId()).orElse(null));
 
         Employee updateEmployee = employeeService.updateMyInfo(employee, authentication);
 
