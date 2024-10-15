@@ -10,6 +10,7 @@ import com.auth.auth.handler.EmployeeAuthenticationSuccessHandler;
 import com.auth.auth.jwt.JwtTokenizer;
 import com.auth.auth.utils.JwtAuthorityUtils;
 import com.auth.employee.repository.EmployeeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,7 +29,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
-
 
 @Configuration
 public class SecurityConfig {
@@ -113,7 +113,7 @@ public class SecurityConfig {
             AuthenticationManager authenticationManager =
                     builder.getSharedObject(AuthenticationManager.class);
             JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenizer, employeeRepository, passwordEncoder());
-            jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
+            jwtAuthenticationFilter.setFilterProcessesUrl("/login");
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new EmployeeAuthenticationSuccessHandler(employeeRepository));
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new EmployeeAuthenticationFailureHandler());
             JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenizer, jwtAuthorityUtils, redisTemplate);
