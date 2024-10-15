@@ -117,15 +117,16 @@ public class EmployeeService extends ExtractMemberEmail {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("employeeId").ascending());
         Page<Employee> allEmployees = employeeRepository.findAll(pageRequest);
 
-        // 관리자 이메일인 admin@example.com을 제외하고, 상태가 EMPLOYEE_QUIT가 아닌 직원들만 필터링
+        // 관리자 이메일과 직원 상태 필터링
         List<Employee> filteredEmployees = allEmployees.stream()
-                .filter(employee -> !"admin@pingpong-works.com".equals(employee.getEmail())) // 관리자 이메일 제외
-                .filter(employee -> employee.getStatus() != Employee.EmployeeStatus.EMPLOYEE_QUIT) // EMPLOYEE_QUIT 상태 제외
+                .filter(employee -> !"admin@pingpong-works.com".equals(employee.getEmail()))
+                .filter(employee -> employee.getStatus() != Employee.EmployeeStatus.EMPLOYEE_QUIT)
                 .collect(Collectors.toList());
 
-        // 필터링된 직원 리스트로 다시 Page 객체 생성
-        return new PageImpl<>(filteredEmployees, pageRequest, filteredEmployees.size());
+        // 필터링된 직원 리스트로 다시 Page 객체 생성 (전체 데이터 수를 기준으로 페이지네이션)
+        return new PageImpl<>(filteredEmployees, pageRequest, allEmployees.getTotalElements());
     }
+
 
 
 
@@ -155,49 +156,90 @@ public class EmployeeService extends ExtractMemberEmail {
 
 
     // 직원 정보 수정 (Patch)
-    public Employee updateEmployee(Employee employee, Authentication authentication) {
+    public Employee updateEmployee(Employee employee, long employeeId) {
+
+        Employee findEmployee = employeeRepository.findById(employeeId)
+                        .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
+        // 이름 업데이트
+        Optional.ofNullable(employee.getName())
+                .filter(name -> !name.equals(findEmployee.getName()))
+                .ifPresent(findEmployee::setName);
+        // 이메일 업데이트
+        Optional.ofNullable(employee.getEmail())
+                .filter(email -> !email.equals(findEmployee.getEmail()))
+                .ifPresent(findEmployee::setEmail);
+        // 휴대폰 번호 업데이트
+        Optional.ofNullable(employee.getPhoneNumber())
+                .filter(phoneNumber -> !phoneNumber.equals(findEmployee.getPhoneNumber()))
+                .ifPresent(findEmployee::setPhoneNumber);
+        // 프로필 사진 업데이트
+        Optional.ofNullable(employee.getProfilePicture())
+                .filter(profilePicture -> !profilePicture.equals(findEmployee.getProfilePicture()))
+                .ifPresent(findEmployee::setProfilePicture);
+        // 내선 번호 업데이트
+        Optional.ofNullable(employee.getExtensionNumber())
+                .filter(extensionNumber -> !extensionNumber.equals(findEmployee.getExtensionNumber()))
+                .ifPresent(findEmployee::setExtensionNumber);
+        // 긴급 연락망 업데이트
+        Optional.ofNullable(employee.getEmergencyNumber())
+                .filter(emergencyNumber -> !emergencyNumber.equals(findEmployee.getEmergencyNumber()))
+                .ifPresent(findEmployee::setEmergencyNumber);
+        // 주소 업데이트
+        Optional.ofNullable(employee.getAddress())
+                .filter(address -> !address.equals(findEmployee.getAddress()))
+                .ifPresent(findEmployee::setAddress);
+        // 차량 번호 업데이트
+        Optional.ofNullable(employee.getVehicleNumber())
+                .filter(vehicleNumber -> !vehicleNumber.equals(findEmployee.getVehicleNumber()))
+                .ifPresent(findEmployee::setVehicleNumber);
+        // 직급 업데이트
+        Optional.ofNullable(employee.getEmployeeRank())
+                .filter(employeeRank -> !employeeRank.equals(findEmployee.getEmployeeRank()))
+                .ifPresent(findEmployee::setEmployeeRank);
+        //부서 업데이트
+        Optional.ofNullable(employee.getDepartment())
+                .filter(department -> !department.equals(findEmployee.getDepartment()))
+                .ifPresent(findEmployee::setDepartment);
+
+        return employeeRepository.save(findEmployee);
+    }
+
+    // 내 정보 수정 (Patch)
+    public Employee updateMyInfo(Employee employee, Authentication authentication) {
         Employee authenticatedEmployee = extractEmployeeFromAuthentication(authentication, employeeRepository);
 
         // 이름 업데이트
         Optional.ofNullable(employee.getName())
                 .filter(name -> !name.equals(authenticatedEmployee.getName()))
                 .ifPresent(authenticatedEmployee::setName);
-
         // 이메일 업데이트
         Optional.ofNullable(employee.getEmail())
                 .filter(email -> !email.equals(authenticatedEmployee.getEmail()))
                 .ifPresent(authenticatedEmployee::setEmail);
-
         // 휴대폰 번호 업데이트
         Optional.ofNullable(employee.getPhoneNumber())
                 .filter(phoneNumber -> !phoneNumber.equals(authenticatedEmployee.getPhoneNumber()))
                 .ifPresent(authenticatedEmployee::setPhoneNumber);
-
         // 프로필 사진 업데이트
         Optional.ofNullable(employee.getProfilePicture())
                 .filter(profilePicture -> !profilePicture.equals(authenticatedEmployee.getProfilePicture()))
                 .ifPresent(authenticatedEmployee::setProfilePicture);
-
         // 내선 번호 업데이트
         Optional.ofNullable(employee.getExtensionNumber())
                 .filter(extensionNumber -> !extensionNumber.equals(authenticatedEmployee.getExtensionNumber()))
                 .ifPresent(authenticatedEmployee::setExtensionNumber);
-
         // 긴급 연락망 업데이트
         Optional.ofNullable(employee.getEmergencyNumber())
                 .filter(emergencyNumber -> !emergencyNumber.equals(authenticatedEmployee.getEmergencyNumber()))
                 .ifPresent(authenticatedEmployee::setEmergencyNumber);
-
         // 주소 업데이트
         Optional.ofNullable(employee.getAddress())
                 .filter(address -> !address.equals(authenticatedEmployee.getAddress()))
                 .ifPresent(authenticatedEmployee::setAddress);
-
         // 차량 번호 업데이트
         Optional.ofNullable(employee.getVehicleNumber())
                 .filter(vehicleNumber -> !vehicleNumber.equals(authenticatedEmployee.getVehicleNumber()))
                 .ifPresent(authenticatedEmployee::setVehicleNumber);
-
         // 직급 업데이트
         Optional.ofNullable(employee.getEmployeeRank())
                 .filter(employeeRank -> !employeeRank.equals(authenticatedEmployee.getEmployeeRank()))

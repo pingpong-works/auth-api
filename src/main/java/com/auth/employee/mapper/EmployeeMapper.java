@@ -1,7 +1,11 @@
 package com.auth.employee.mapper;
 
+import com.auth.department.entity.Department;
+import com.auth.department.repository.DepartmentRepository;
 import com.auth.employee.dto.EmployeeDto;
 import com.auth.employee.entity.Employee;
+import com.auth.exception.BusinessLogicException;
+import com.auth.exception.ExceptionCode;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -132,6 +136,7 @@ public interface EmployeeMapper {
         if (patchDto == null) {
             return null;
         }
+
         Employee employee = new Employee();
         employee.setName(patchDto.getName());
         employee.setEmail(patchDto.getEmail());
@@ -142,6 +147,7 @@ public interface EmployeeMapper {
         employee.setEmergencyNumber(patchDto.getEmergencyNumber());
         employee.setAddress(patchDto.getAddress());
         employee.setVehicleNumber(patchDto.getVehicleNumber());
+
         return employee;
     }
 }

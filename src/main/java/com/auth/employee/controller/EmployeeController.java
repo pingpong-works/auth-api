@@ -2,6 +2,8 @@ package com.auth.employee.controller;
 
 
 import com.auth.auth.service.AuthService;
+import com.auth.department.entity.Department;
+import com.auth.department.repository.DepartmentRepository;
 import com.auth.dto.MultiResponseDto;
 import com.auth.dto.SingleResponseDto;
 import com.auth.employee.dto.EmployeeDto;
@@ -9,6 +11,8 @@ import com.auth.employee.entity.Employee;
 import com.auth.employee.mapper.EmployeeMapper;
 import com.auth.employee.repository.EmployeeRepository;
 import com.auth.employee.service.EmployeeService;
+import com.auth.exception.BusinessLogicException;
+import com.auth.exception.ExceptionCode;
 import com.auth.utils.UriCreator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,6 +39,7 @@ public class EmployeeController {
     private final EmployeeMapper employeeMapper;
     private final AuthService authService;
     private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
 
     // 직원
     @PostMapping("/employees")
@@ -77,9 +82,7 @@ public class EmployeeController {
     // 전체 회원 조회 (주소록)
     @GetMapping("/employees/all")
     public ResponseEntity getEmployeesForAdmin(@RequestParam @Positive int page,
-                                       @RequestParam @Positive int size, Authentication authentication) {
-
-        System.out.println("Authentication@@@@: " + authentication);
+                                               @RequestParam @Positive int size, Authentication authentication) {
 
         // Service에서 인증 및 권한 검증 수행
         Page<Employee> pageEmployees = employeeService.findEmployees(page - 1, size, authentication);
@@ -90,6 +93,7 @@ public class EmployeeController {
                 HttpStatus.OK
         );
     }
+
 
 
     // 특정 회원 조회 - 관리자, 직원 (주소록)
@@ -106,7 +110,7 @@ public class EmployeeController {
 
     // 부서별 직원 조회 - 관리자용 (주소록)
     @GetMapping("/admin/employees/departments/{departmentId}")
-    public ResponseEntity<MultiResponseDto<EmployeeDto.AdminResponse>> getEmployeesByDepartmentForAdmin(
+    public ResponseEntity<MultiResponseDto<EmployeeDto.InfoResponse>> getEmployeesByDepartmentForAdmin(
             @PathVariable Long departmentId,
             @RequestParam @Positive int page,
             @RequestParam @Positive int size, Authentication authentication) {
@@ -114,7 +118,7 @@ public class EmployeeController {
 //        employeeService.checkAdminAuthority(authentication);
         // Service에서 인증 및 권한 검증 수행
         Page<Employee> pageEmployees = employeeService.findEmployeesByDepartment(departmentId, page - 1, size, authentication);
-        List<EmployeeDto.AdminResponse> responseDtos = employeeMapper.employeesToAdminInfoResponseDto(pageEmployees.getContent());
+        List<EmployeeDto.InfoResponse> responseDtos = employeeMapper.employeesToEmployeeInfoResponseDto(pageEmployees.getContent());
 
         return new ResponseEntity<>(
                 new MultiResponseDto<>(responseDtos, pageEmployees),
@@ -162,9 +166,37 @@ public class EmployeeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    // 직원 정보 수정
+    @PatchMapping("/employees/{employee-id}")
+    public ResponseEntity patchEmployee(
+            @PathVariable("employee-id") Long employeeId,
+            Authentication authentication,
+            @Valid @RequestBody EmployeeDto.Patch patch,
+            BindingResult bindingResult) {
+
+        employeeService.checkAdminAuthority(authentication);
+        // 입력 값에 오류가 있는지 확인
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
+        }
+
+        // Service에서 인증 및 권한 검증 수행 후 정보 수정
+        Employee employee = employeeMapper.employeePatchToEmployee(patch);
+        Department department = departmentRepository.findById(patch.getDepartmentId())
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.DEPARTMENT_NOT_FOUND));
+        employee.setDepartment(department);
+
+        Employee updateEmployee = employeeService.updateEmployee(employee, employeeId);
+
+
+        return new ResponseEntity<>(
+                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(updateEmployee)), HttpStatus.OK
+        );
+    }
+
     // 내 정보 수정
     @PatchMapping("/employees")
-    public ResponseEntity patchEmployee(Authentication authentication,
+    public ResponseEntity patchMyInfo(Authentication authentication,
                                         @Valid @RequestBody EmployeeDto.Patch patch,
                                         BindingResult bindingResult) {
 
@@ -174,10 +206,13 @@ public class EmployeeController {
         }
 
         // Service에서 인증 및 권한 검증 수행 후 정보 수정
-        Employee employee = employeeService.updateEmployee(employeeMapper.employeePatchToEmployee(patch), authentication);
+        Employee employee = employeeMapper.employeePatchToEmployee(patch);
+        employee.setDepartment(departmentRepository.findById(patch.getDepartmentId()).orElse(null));
+
+        Employee updateEmployee = employeeService.updateMyInfo(employee, authentication);
 
         return new ResponseEntity<>(
-                new SingleResponseDto<>(employeeMapper.employeeToAdminResponseDto(employee)), HttpStatus.OK
+                new SingleResponseDto<>(employeeMapper.employeeToEmployeeInfoResponse(updateEmployee)), HttpStatus.OK
         );
     }
 
