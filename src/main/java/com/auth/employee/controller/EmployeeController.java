@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping
 @RequiredArgsConstructor
 public class EmployeeController {
     private final static String EMPLOYEE_DEFAULT_URL = "/employees";
@@ -78,6 +78,8 @@ public class EmployeeController {
     @GetMapping("/employees/all")
     public ResponseEntity getEmployeesForAdmin(@RequestParam @Positive int page,
                                        @RequestParam @Positive int size, Authentication authentication) {
+
+        System.out.println("Authentication@@@@: " + authentication);
 
         // Service에서 인증 및 권한 검증 수행
         Page<Employee> pageEmployees = employeeService.findEmployees(page - 1, size, authentication);
