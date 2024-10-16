@@ -44,8 +44,11 @@ public class EmployeeController {
 
     // 직원
     @PostMapping("/employees")
-    public ResponseEntity createEmployee(@Valid @RequestBody EmployeeDto.EmployeePost employeeDto, BindingResult bindingResult) {
+    public ResponseEntity createEmployee(@Valid @RequestBody EmployeeDto.EmployeePost employeeDto, Authentication authentication, BindingResult bindingResult) {
         // 유효성 검사 후 에러가 있으면 처리
+
+        employeeService.checkAdminAuthority(authentication);
+
         if (bindingResult.hasErrors()) {
             // 유효성 검사에서 발생한 오류 메시지들을 반환
             List<String> errorMessages = bindingResult.getFieldErrors().stream()
@@ -134,9 +137,24 @@ public class EmployeeController {
 
         // Service에서 인증 및 권한 검증 수행
         Employee employee = employeeService.findEmployeeById(id);
-        EmployeeDto.UserResponse response = employeeMapper.employeeToUserResponseDto(employee);
 
-        return ResponseEntity.ok(new SingleResponseDto<>(response));
+
+
+        if (employee.getEmail().equals("admin@pingpong-works.com")) {  // 관리자인 경우
+            // 관리자용 응답
+            EmployeeDto.AdminResponse adminInfoResponse = employeeMapper.employeeToAdminInfoResponse(employee);
+
+            return new ResponseEntity(
+                    new SingleResponseDto<>(adminInfoResponse), HttpStatus.OK);
+        } else {
+            // 직원용 응답
+            EmployeeDto.InfoResponse employeeInfoResponse = employeeMapper.employeeToEmployeeInfoResponse(employee);
+            employeeInfoResponse.setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getName() : null);
+
+            return new ResponseEntity(
+                    new SingleResponseDto<>(employeeInfoResponse), HttpStatus.OK);
+        }
+
     }
 
     // 부서별 직원 조회 - 직원용 (주소록) -> 대시보드 부서 활동에서 사용
