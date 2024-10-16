@@ -28,7 +28,7 @@ public class Department extends Auditable {
     @Column(name = "department_name", nullable = false, length = Integer.MAX_VALUE, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "department")
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // 순환 참조 방지
     private List<Employee> employees;
 }

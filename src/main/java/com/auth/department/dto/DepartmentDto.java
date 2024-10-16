@@ -25,10 +25,14 @@ public class DepartmentDto {
     @Setter
     @NoArgsConstructor
     public static class Response {
-
         private long id;
-
         private String name;
+        private int employeeCount; // 직원 수 추가
 
+        public Response(Long id, String name, int employeeCount) {
+            this.id = id;
+            this.name = name;
+            this.employeeCount = employeeCount;
+        }
     }
 }

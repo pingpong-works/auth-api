@@ -5,12 +5,14 @@ import com.auth.department.dto.DepartmentDto;
 import com.auth.department.entity.Department;
 import com.auth.department.mapper.DepartmentMapper;
 import com.auth.department.repository.DepartmentRepository;
+import com.auth.employee.entity.Employee;
 import com.auth.employee.service.EmployeeService;
 import com.auth.exception.BusinessLogicException;
 import com.auth.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,5 +46,16 @@ public class DepartmentService {
         Optional<Department> optionalDepartment = departmentRepository.findById(departmentId);
         return optionalDepartment.orElseThrow(() ->
                 new BusinessLogicException(ExceptionCode.DEPARTMENT_NOT_FOUND));
+    }
+
+    @Transactional
+    public void deleteDepartmentById(Long departmentId, Authentication authentication) {
+
+        employeeService.checkAdminAuthority(authentication);
+
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
+
+        departmentRepository.delete(department);
     }
 }
