@@ -30,6 +30,7 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
@@ -98,11 +99,11 @@ public class EmployeeController {
 
     // 특정 회원 조회 - 관리자, 직원 (주소록)
     @GetMapping("/employees/{id}")
-    public ResponseEntity<SingleResponseDto<EmployeeDto.InfoResponse>> getEmployeeByIdForAdmin(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<SingleResponseDto<EmployeeDto.InfoResponse>> getEmployeeByIdForAdmin(@PathVariable Long id ) {
 
 //        employeeService.checkAdminAuthority(authentication);
         // Service에서 인증 및 권한 검증 수행
-        Employee employee = employeeService.findEmployeeById(id, authentication);
+        Employee employee = employeeService.findEmployeeById(id);
         EmployeeDto.InfoResponse response = employeeMapper.employeeToEmployeeInfoResponse(employee);
 
         return ResponseEntity.ok(new SingleResponseDto<>(response));
@@ -129,10 +130,10 @@ public class EmployeeController {
 
     // 특정 회원 조회 - 직원용 (주소록)
     @GetMapping("/user/employees/{id}")
-    public ResponseEntity<SingleResponseDto<EmployeeDto.UserResponse>> getEmployeeByIdForUser(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<SingleResponseDto<EmployeeDto.UserResponse>> getEmployeeByIdForUser(@PathVariable Long id) {
 
         // Service에서 인증 및 권한 검증 수행
-        Employee employee = employeeService.findEmployeeById(id, authentication);
+        Employee employee = employeeService.findEmployeeById(id);
         EmployeeDto.UserResponse response = employeeMapper.employeeToUserResponseDto(employee);
 
         return ResponseEntity.ok(new SingleResponseDto<>(response));
