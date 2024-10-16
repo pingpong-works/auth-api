@@ -60,9 +60,10 @@ public class JwtTokenizer {
                                       String base64EncodedSecretKey) {
         Key key = getKeyFromBase64EncodeKey(base64EncodedSecretKey);
         String username = (String) claims.get("username");
+        Long employeeId = (Long) claims.get("employeeId");
 
         // username 검증
-        if (username == null) {
+        if (username == null || employeeId == null) {
             throw new IllegalArgumentException("Username in claims cannot be null");
         }
 
@@ -76,7 +77,6 @@ public class JwtTokenizer {
 
         ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
         valueOperations.set(username, accessToken, accessTokenExpirationMinutes, TimeUnit.MINUTES);
-        log.info("Saving token for user: " + username + " with expiration: " + accessTokenExpirationMinutes);
         return accessToken;
     }
 
@@ -144,5 +144,14 @@ public class JwtTokenizer {
                 .parseClaimsJws(token);
 
         return claims.getBody().getSubject();  // 일반적으로 subject에 이메일이 저장됨
+    }
+
+    public Long getEmployeeIdFromToken(String token) {
+        Jws<Claims> claims = Jwts.parserBuilder()
+                .setSigningKey(getKeyFromBase64EncodeKey(secretKey))
+                .build()
+                .parseClaimsJws(token);
+
+        return (Long) claims.getBody().get("employeeId");  // 클레임에서 employeeId 추출
     }
 }
