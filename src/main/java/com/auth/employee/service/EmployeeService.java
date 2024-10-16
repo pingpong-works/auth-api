@@ -102,7 +102,7 @@ public class EmployeeService extends ExtractMemberEmail {
 
 
     // 직원 정보 조회 (Admin 권한만 가능)
-    public Employee findEmployeeById(Long id, Authentication authentication) {
+    public Employee findEmployeeById(Long id) {
 
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionCode.EMPLOYEE_NOT_FOUND));
