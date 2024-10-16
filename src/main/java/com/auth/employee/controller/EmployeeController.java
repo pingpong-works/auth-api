@@ -44,8 +44,11 @@ public class EmployeeController {
 
     // 직원
     @PostMapping("/employees")
-    public ResponseEntity createEmployee(@Valid @RequestBody EmployeeDto.EmployeePost employeeDto, BindingResult bindingResult) {
+    public ResponseEntity createEmployee(@Valid @RequestBody EmployeeDto.EmployeePost employeeDto, Authentication authentication, BindingResult bindingResult) {
         // 유효성 검사 후 에러가 있으면 처리
+
+        employeeService.checkAdminAuthority(authentication);
+
         if (bindingResult.hasErrors()) {
             // 유효성 검사에서 발생한 오류 메시지들을 반환
             List<String> errorMessages = bindingResult.getFieldErrors().stream()
