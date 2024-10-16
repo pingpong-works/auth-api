@@ -134,9 +134,24 @@ public class EmployeeController {
 
         // Service에서 인증 및 권한 검증 수행
         Employee employee = employeeService.findEmployeeById(id);
-        EmployeeDto.UserResponse response = employeeMapper.employeeToUserResponseDto(employee);
 
-        return ResponseEntity.ok(new SingleResponseDto<>(response));
+
+
+        if (employee.getEmail().equals("admin@pingpong-works.com")) {  // 관리자인 경우
+            // 관리자용 응답
+            EmployeeDto.AdminResponse adminInfoResponse = employeeMapper.employeeToAdminInfoResponse(employee);
+
+            return new ResponseEntity(
+                    new SingleResponseDto<>(adminInfoResponse), HttpStatus.OK);
+        } else {
+            // 직원용 응답
+            EmployeeDto.InfoResponse employeeInfoResponse = employeeMapper.employeeToEmployeeInfoResponse(employee);
+            employeeInfoResponse.setDepartmentName(employee.getDepartment() != null ? employee.getDepartment().getName() : null);
+
+            return new ResponseEntity(
+                    new SingleResponseDto<>(employeeInfoResponse), HttpStatus.OK);
+        }
+
     }
 
     // 부서별 직원 조회 - 직원용 (주소록) -> 대시보드 부서 활동에서 사용
