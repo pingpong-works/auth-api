@@ -127,7 +127,7 @@ public class EmployeeController {
     }
 
 
-    // 특정 회원 조회 - 직원용 (주소록)
+    // 특정 회원 조회
     @GetMapping("/user/employees/{id}")
     public ResponseEntity<SingleResponseDto<EmployeeDto.UserResponse>> getEmployeeByIdForUser(@PathVariable Long id, Authentication authentication) {
 

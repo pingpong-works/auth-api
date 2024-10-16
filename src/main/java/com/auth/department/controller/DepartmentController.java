@@ -40,6 +40,12 @@ public class DepartmentController {
     public ResponseEntity getDepartment(@PathVariable("id") @Positive long id) {
         Department department = departmentService.findVerifiedDepartment(id);
         return new ResponseEntity<>(
-                new SingleResponseDto<>(mapper.departmentToDepartmentResponseDto(department)), HttpStatus.OK);
+                new SingleResponseDto<>(mapper.toDepartmentResponse(department)), HttpStatus.OK);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity deleteDepartment(@PathVariable("id") @Positive long id, Authentication authentication) {
+        departmentService.deleteDepartmentById(id, authentication);
+        return ResponseEntity.noContent().build();
     }
 }
