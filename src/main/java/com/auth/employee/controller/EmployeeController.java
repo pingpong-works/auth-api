@@ -100,7 +100,7 @@ public class EmployeeController {
 
 
 
-    // 특정 회원 조회 - 관리자, 직원 (주소록)
+    // 특정 회원 조회 (이거 말고 /user/employees/{id} 사용해주세요 )
     @GetMapping("/employees/{id}")
     public ResponseEntity<SingleResponseDto<EmployeeDto.InfoResponse>> getEmployeeByIdForAdmin(@PathVariable Long id ) {
 
@@ -112,7 +112,7 @@ public class EmployeeController {
         return ResponseEntity.ok(new SingleResponseDto<>(response));
     }
 
-    // 부서별 직원 조회 - 관리자용 (주소록)
+    // 부서별 직원 조회
     @GetMapping("/admin/employees/departments/{departmentId}")
     public ResponseEntity<MultiResponseDto<EmployeeDto.InfoResponse>> getEmployeesByDepartmentForAdmin(
             @PathVariable Long departmentId,
